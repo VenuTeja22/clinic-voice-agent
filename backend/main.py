@@ -2,12 +2,24 @@ import os
 import time
 import json
 import asyncio
+import ssl
+import certifi
 from typing import List, Dict, Any, Set
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import aiohttp
 from dotenv import load_dotenv
+
+# SSL Context helper for macOS
+def get_ssl_context():
+    try:
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
 
 # Load .env
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
@@ -85,7 +97,8 @@ async def create_daily_room_and_tokens() -> Dict[str, str]:
         "Content-Type": "application/json"
     }
 
-    async with aiohttp.ClientSession() as session:
+    connector = aiohttp.TCPConnector(ssl=get_ssl_context())
+    async with aiohttp.ClientSession(connector=connector) as session:
         # Create Room (expires in 2 hours)
         room_payload = {
             "properties": {

@@ -1,8 +1,19 @@
 import os
 import sys
 import asyncio
+import ssl
+import certifi
 import aiohttp
 from typing import Callable, Optional, Dict, Any
+
+def get_ssl_context():
+    try:
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx
 
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.task import PipelineTask, PipelineParams
@@ -80,7 +91,8 @@ async def run_bot(
     if not gemini_key or not eleven_key:
         raise ValueError("Missing GEMINI_API_KEY or ELEVENLABS_API_KEY in environment.")
 
-    async with aiohttp.ClientSession() as aiohttp_session:
+    connector = aiohttp.TCPConnector(ssl=get_ssl_context())
+    async with aiohttp.ClientSession(connector=connector) as aiohttp_session:
         # 1. Transport (Daily WebRTC + Silero VAD)
         vad = SileroVADAnalyzer()
         transport = DailyTransport(
