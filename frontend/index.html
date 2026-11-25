@@ -3,154 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CuraClinic - Voice Appointment Assistant</title>
+  <title>NexovAI — Clinic Voice Agent Infrastructure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <!-- Header Navigation -->
-  <header class="header">
-    <div class="container header-container">
-      <div class="brand">
-        <div class="logo-icon">🩺</div>
-        <div>
-          <div class="brand-title">
-            <span>CuraClinic</span>
-            <span class="badge">Voice Assistant</span>
-          </div>
-          <p class="brand-subtitle">Autonomous Doctor Appointment Management</p>
+<body class="nexov-dark">
+  <!-- Glowing Background Mesh -->
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-top-right"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <div class="brand-badge-dot"></div>
+        <span class="brand-text">Nexov<span class="text-mint">AI</span></span>
+        <span class="nav-pill">Voice Infrastructure</span>
+      </div>
+
+      <div class="nav-center-metrics">
+        <div class="metric-chip">
+          <span class="dot-pulse"></span>
+          <span>WebSocket Stream</span>
+        </div>
+        <div class="metric-chip">
+          <span class="chip-val">&lt;87ms</span>
+          <span class="chip-lbl">VAD Latency</span>
         </div>
       </div>
-      <div class="header-actions">
-        <div class="status-indicator">
-          <span class="status-dot"></span>
-          <span>Voice Pipeline Ready</span>
-        </div>
-        <button id="startCallBtn" class="btn btn-primary">
-          <span class="phone-icon">📞</span>
-          <span>Start Voice Call</span>
+
+      <div class="nav-actions">
+        <button id="startCallBtn" class="btn btn-mint-glow">
+          <span class="pulse-icon">●</span>
+          <span>Start Voice Agent</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Dashboard Content -->
-  <main class="container main-content">
-    <!-- Hero Banner -->
-    <section class="hero-banner">
-      <div class="hero-content">
-        <span class="hero-tag">✨ Real-time Voice AI Desk</span>
-        <h1>Book & Manage Appointments with Natural Voice</h1>
-        <p>Click <strong>Start Voice Call</strong> to speak directly with Cura, our clinic voice receptionist. State your phone number, check available physician slots, and confirm your booking or cancellation.</p>
-        
-        <div class="steps-row">
-          <div class="step-item"><span class="step-num">1</span> Speak phone number</div>
-          <div class="step-item"><span class="step-num">2</span> Agent confirms & reads back</div>
-          <div class="step-item"><span class="step-num">3</span> Live dashboard auto-update</div>
-        </div>
+  <!-- Main Hero Section -->
+  <main class="main-container">
+    <section class="hero-section">
+      <div class="hero-tagline">
+        <span class="tag-sparkle">✦</span>
+        <span>NEXT-GEN HEALTHCARE INTELLIGENCE</span>
+      </div>
+
+      <h1 class="hero-title">
+        Autonomous Voice Infrastructure<br>
+        <span class="hero-gradient-text">for Clinic Appointment Booking.</span>
+      </h1>
+
+      <p class="hero-description">
+        Sub-100ms conversational AI receptionist running on pure WebSockets, Silero VAD, ElevenLabs Neural TTS, and Google Gemini reasoning.
+      </p>
+
+      <div class="hero-badges">
+        <span class="spec-badge">⚡ Real-time Full Duplex</span>
+        <span class="spec-badge">🎙️ Spoken Phone Auth</span>
+        <span class="spec-badge">🔒 Guardrailed Scope</span>
+        <span class="spec-badge">📅 Live JSON Sync</span>
       </div>
     </section>
 
-    <!-- Doctors & Available Slots Section -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <h2>Physicians & Available Slots</h2>
-          <p class="section-desc">Live schedule synced with clinic directory</p>
+    <!-- Operational Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Physicians & Live Slots Section -->
+      <section class="console-card">
+        <div class="card-topbar">
+          <div class="card-title-group">
+            <span class="terminal-icon">❖</span>
+            <div>
+              <h2 class="card-heading">Active Physicians & Slot Registry</h2>
+              <p class="card-sub">Dynamic slot allocation via function calling</p>
+            </div>
+          </div>
+          <span id="doctorsCountBadge" class="neon-badge">4 Physicians Active</span>
         </div>
-        <span id="doctorsCountBadge" class="badge">4 Doctors on Duty</span>
-      </div>
-      <div id="doctorsGrid" class="doctors-grid">
-        <div class="loading">Loading doctor schedules...</div>
-      </div>
-    </section>
 
-    <!-- Appointments Registry Section -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <h2>Live Appointments Registry</h2>
-          <p class="section-desc">Auto-updates in real time when booked or cancelled by voice</p>
+        <div id="doctorsGrid" class="doctors-grid">
+          <div class="loading-state">Synchronizing physician roster...</div>
         </div>
-        <span id="appointmentsCountBadge" class="badge-neutral">0 Total</span>
-      </div>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Patient Phone</th>
-              <th>Doctor</th>
-              <th>Specialty</th>
-              <th>Date & Time</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="appointmentsTableBody">
-            <tr><td colspan="5" class="loading">Loading appointments...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+      </section>
+
+      <!-- Live Appointments Registry Table -->
+      <section class="console-card">
+        <div class="card-topbar">
+          <div class="card-title-group">
+            <span class="terminal-icon">📋</span>
+            <div>
+              <h2 class="card-heading">Live Appointments Stream</h2>
+              <p class="card-sub">Real-time ledger updating instantaneously upon voice confirmation</p>
+            </div>
+          </div>
+          <span id="appointmentsCountBadge" class="neon-badge-neutral">0 Bookings</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="nexov-table">
+            <thead>
+              <tr>
+                <th>Patient Phone</th>
+                <th>Assigned Physician</th>
+                <th>Specialty</th>
+                <th>Slot Timestamp</th>
+                <th>State</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentsTableBody">
+              <tr><td colspan="5" class="loading-state">Loading appointment ledger...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>CuraClinic Voice Agent • Built with Pipecat, ElevenLabs STT/TTS, Google Gemini, and Daily WebRTC</p>
-  </footer>
-
-  <!-- Phone Call Overlay Modal (Bonus Feature) -->
-  <div id="phoneModal" class="modal-overlay hidden">
-    <div class="phone-frame">
-      <!-- Notch / Island -->
-      <div class="phone-notch">
-        <div class="notch-camera"></div>
-        <div class="notch-led"></div>
+  <!-- Futuristic Phone Modal (Voice Agent Interface) -->
+  <div id="phoneModal" class="modal-backdrop hidden">
+    <div class="nexov-terminal-phone">
+      <!-- Terminal Status Bar -->
+      <div class="phone-top-island">
+        <div class="island-camera"></div>
+        <div class="island-indicator"></div>
       </div>
 
-      <!-- Call Screen Header -->
-      <div class="phone-header">
-        <div class="avatar-circle">🎙️</div>
-        <h3 class="caller-name">Cura AI Receptionist</h3>
-        <p class="clinic-sub">CuraClinic Voice Desk</p>
+      <!-- Agent Avatar & Identity -->
+      <div class="agent-profile">
+        <div class="neon-orb">
+          <div class="orb-core"></div>
+        </div>
+        <h3 class="agent-title">Cura Voice Agent</h3>
+        <p class="agent-sub">NexovAI Voice Core v2.4.1</p>
 
-        <div class="call-status-wrapper">
-          <span id="callStatusText" class="call-status">Connecting audio...</span>
+        <!-- Status & Waveform -->
+        <div class="call-status-row">
+          <span id="callStatusText" class="status-live">Connecting WebSocket...</span>
         </div>
 
-        <!-- Waveform Activity -->
-        <div class="waveform-container">
-          <span class="wave-bar w1"></span>
-          <span class="wave-bar w2"></span>
-          <span class="wave-bar w3"></span>
-          <span class="wave-bar w4"></span>
-          <span class="wave-bar w5"></span>
+        <!-- Glowing Neon Waveform -->
+        <div class="waveform-box">
+          <span class="bar b1"></span>
+          <span class="bar b2"></span>
+          <span class="bar b3"></span>
+          <span class="bar b4"></span>
+          <span class="bar b5"></span>
+          <span class="bar b6"></span>
+          <span class="bar b7"></span>
         </div>
       </div>
 
       <!-- Action Confirmation Toast -->
-      <div id="actionToast" class="action-toast hidden">
-        <span class="toast-icon">✓</span>
+      <div id="actionToast" class="terminal-toast hidden">
+        <span class="toast-dot"></span>
         <span id="actionToastText">Appointment Confirmed</span>
       </div>
 
-      <!-- Live Transcripts -->
-      <div id="transcriptBox" class="transcript-box">
+      <!-- Live Telephony Transcript Stream -->
+      <div id="transcriptBox" class="terminal-transcript">
         <div class="transcript-placeholder">
-          Say hello or ask for available appointments.<br>
-          <small>e.g. "Hi, what doctors are available tomorrow?"</small>
+          <p class="dim-text">Speak to Cura to schedule, check, or cancel appointments.</p>
+          <p class="hint-text">"Hi, is Dr. Sarah Jenkins available tomorrow?"</p>
         </div>
       </div>
 
-      <!-- Call Controls -->
-      <div class="phone-controls">
-        <button id="muteBtn" class="control-btn mute-btn" title="Mute Microphone">
-          🎤
+      <!-- Control Deck -->
+      <div class="terminal-deck">
+        <button id="muteBtn" class="deck-btn deck-btn-mute" title="Mute Microphone">
+          <span class="btn-symbol">🎤</span>
         </button>
-        <button id="endCallBtn" class="control-btn end-btn" title="End Call">
-          📞
+        <button id="endCallBtn" class="deck-btn deck-btn-hangup" title="Terminate Session">
+          <span class="btn-symbol">✕</span>
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="nexov-footer">
+    <div class="footer-container">
+      <div class="ft-brand">
+        <span class="brand-text">Nexov<span class="text-mint">AI</span></span>
+        <span class="ft-sub">— Autonomous Voice Agent Infrastructure</span>
+      </div>
+      <p class="ft-copy">© 2026 NexovAI — Voice AI Doctor Appointment Assistant</p>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
