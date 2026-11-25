@@ -1,137 +1,86 @@
-import sqlite3
 import os
-from typing import List, Dict, Optional, Any
+import json
+from typing import List, Dict, Any, Optional
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "clinic.db")
+DATA_FILE = os.path.join(os.path.dirname(__file__), "clinic_data.json")
 
-def get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+INITIAL_DATA = {
+    "doctors": [
+        {"id": 1, "name": "Dr. Sarah Jenkins", "specialty": "Cardiology"},
+        {"id": 2, "name": "Dr. Rajesh Sharma", "specialty": "General Medicine"},
+        {"id": 3, "name": "Dr. Emily Watson", "specialty": "Dermatology"},
+        {"id": 4, "name": "Dr. Michael Chang", "specialty": "Pediatrics"}
+    ],
+    "slots": [
+        {"id": 1, "doctor_id": 1, "doctor_name": "Dr. Sarah Jenkins", "date": "2026-11-26", "time": "09:00 AM", "is_booked": False},
+        {"id": 2, "doctor_id": 1, "doctor_name": "Dr. Sarah Jenkins", "date": "2026-11-26", "time": "10:30 AM", "is_booked": False},
+        {"id": 3, "doctor_id": 1, "doctor_name": "Dr. Sarah Jenkins", "date": "2026-11-26", "time": "02:00 PM", "is_booked": False},
+        {"id": 4, "doctor_id": 1, "doctor_name": "Dr. Sarah Jenkins", "date": "2026-11-26", "time": "04:30 PM", "is_booked": False},
+        {"id": 5, "doctor_id": 2, "doctor_name": "Dr. Rajesh Sharma", "date": "2026-11-26", "time": "09:00 AM", "is_booked": False},
+        {"id": 6, "doctor_id": 2, "doctor_name": "Dr. Rajesh Sharma", "date": "2026-11-26", "time": "10:30 AM", "is_booked": False},
+        {"id": 7, "doctor_id": 2, "doctor_name": "Dr. Rajesh Sharma", "date": "2026-11-26", "time": "02:00 PM", "is_booked": False},
+        {"id": 8, "doctor_id": 2, "doctor_name": "Dr. Rajesh Sharma", "date": "2026-11-26", "time": "04:30 PM", "is_booked": False},
+        {"id": 9, "doctor_id": 3, "doctor_name": "Dr. Emily Watson", "date": "2026-11-26", "time": "09:00 AM", "is_booked": False},
+        {"id": 10, "doctor_id": 3, "doctor_name": "Dr. Emily Watson", "date": "2026-11-26", "time": "10:30 AM", "is_booked": False},
+        {"id": 11, "doctor_id": 3, "doctor_name": "Dr. Emily Watson", "date": "2026-11-26", "time": "02:00 PM", "is_booked": False},
+        {"id": 12, "doctor_id": 3, "doctor_name": "Dr. Emily Watson", "date": "2026-11-26", "time": "04:30 PM", "is_booked": False},
+        {"id": 13, "doctor_id": 4, "doctor_name": "Dr. Michael Chang", "date": "2026-11-26", "time": "09:00 AM", "is_booked": False},
+        {"id": 14, "doctor_id": 4, "doctor_name": "Dr. Michael Chang", "date": "2026-11-26", "time": "10:30 AM", "is_booked": False},
+        {"id": 15, "doctor_id": 4, "doctor_name": "Dr. Michael Chang", "date": "2026-11-26", "time": "02:00 PM", "is_booked": False},
+        {"id": 16, "doctor_id": 4, "doctor_name": "Dr. Michael Chang", "date": "2026-11-26", "time": "04:30 PM", "is_booked": False}
+    ],
+    "appointments": [
+        {
+            "id": 1,
+            "patient_name": "Alex Rivera",
+            "patient_phone": "9876543210",
+            "doctor_id": 1,
+            "doctor_name": "Dr. Sarah Jenkins",
+            "specialty": "Cardiology",
+            "date": "2026-11-26",
+            "time": "09:00 AM",
+            "status": "CONFIRMED"
+        }
+    ]
+}
+
+def load_data() -> Dict[str, Any]:
+    if not os.path.exists(DATA_FILE):
+        save_data(INITIAL_DATA)
+        return INITIAL_DATA
+    try:
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        save_data(INITIAL_DATA)
+        return INITIAL_DATA
+
+def save_data(data: Dict[str, Any]):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f, indent=2)
 
 def init_db():
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    # Doctors Table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS doctors (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            specialty TEXT NOT NULL
-        )
-    """)
-
-    # Available Slots Table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS slots (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            doctor_id INTEGER NOT NULL,
-            date TEXT NOT NULL,
-            time TEXT NOT NULL,
-            is_booked INTEGER DEFAULT 0,
-            FOREIGN KEY (doctor_id) REFERENCES doctors (id)
-        )
-    """)
-
-    # Booked Appointments Table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS appointments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            patient_name TEXT,
-            patient_phone TEXT NOT NULL,
-            doctor_id INTEGER NOT NULL,
-            doctor_name TEXT NOT NULL,
-            specialty TEXT NOT NULL,
-            date TEXT NOT NULL,
-            time TEXT NOT NULL,
-            status TEXT DEFAULT 'CONFIRMED',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (doctor_id) REFERENCES doctors (id)
-        )
-    """)
-
-    # Populate initial mock data if empty
-    cursor.execute("SELECT COUNT(*) FROM doctors")
-    if cursor.fetchone()[0] == 0:
-        doctors_data = [
-            ("Dr. Sarah Jenkins", "Cardiology"),
-            ("Dr. Rajesh Sharma", "General Medicine"),
-            ("Dr. Emily Watson", "Dermatology"),
-            ("Dr. Michael Chang", "Pediatrics")
-        ]
-        cursor.executemany("INSERT INTO doctors (name, specialty) VALUES (?, ?)", doctors_data)
-        
-        # Populate slots for each doctor across today and tomorrow
-        cursor.execute("SELECT id, name FROM doctors")
-        docs = cursor.fetchall()
-
-        times = ["09:00 AM", "10:30 AM", "02:00 PM", "04:30 PM"]
-        dates = ["2026-11-26", "2026-11-27"]
-
-        slots_data = []
-        for doc in docs:
-            for d in dates:
-                for t in times:
-                    slots_data.append((doc["id"], d, t, 0))
-
-        cursor.executemany("INSERT INTO slots (doctor_id, date, time, is_booked) VALUES (?, ?, ?, ?)", slots_data)
-
-        # Seed 1 initial appointment to demonstrate cancellation/listing
-        sample_doc = docs[0]
-        cursor.execute("""
-            INSERT INTO appointments (patient_name, patient_phone, doctor_id, doctor_name, specialty, date, time, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, ("Alex Rivera", "9876543210", sample_doc["id"], sample_doc["name"], "Cardiology", "2026-11-26", "09:00 AM", "CONFIRMED"))
-        
-        cursor.execute("UPDATE slots SET is_booked = 1 WHERE doctor_id = ? AND date = ? AND time = ?",
-                       (sample_doc["id"], "2026-11-26", "09:00 AM"))
-
-    conn.commit()
-    conn.close()
+    load_data()
 
 def get_all_doctors_with_slots() -> List[Dict[str, Any]]:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT d.id, d.name, d.specialty, s.id as slot_id, s.date, s.time, s.is_booked
-        FROM doctors d
-        LEFT JOIN slots s ON d.id = s.doctor_id
-        ORDER BY d.name, s.date, s.time
-    """)
-    rows = cursor.fetchall()
-    conn.close()
+    data = load_data()
+    doctors = data.get("doctors", [])
+    slots = data.get("slots", [])
 
-    doctors_map = {}
-    for row in rows:
-        d_id = row["id"]
-        if d_id not in doctors_map:
-            doctors_map[d_id] = {
-                "id": row["id"],
-                "name": row["name"],
-                "specialty": row["specialty"],
-                "slots": []
-            }
-        if row["slot_id"] is not None:
-            doctors_map[d_id]["slots"].append({
-                "id": row["slot_id"],
-                "date": row["date"],
-                "time": row["time"],
-                "is_booked": bool(row["is_booked"])
-            })
-    return list(doctors_map.values())
+    results = []
+    for doc in doctors:
+        doc_slots = [
+            {"id": s["id"], "date": s["date"], "time": s["time"], "is_booked": s["is_booked"]}
+            for s in slots if s["doctor_id"] == doc["id"]
+        ]
+        results.append({
+            "id": doc["id"],
+            "name": doc["name"],
+            "specialty": doc["specialty"],
+            "slots": doc_slots
+        })
+    return results
 
 def get_all_appointments() -> List[Dict[str, Any]]:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, patient_name, patient_phone, doctor_name, specialty, date, time, status, created_at
-        FROM appointments
-        ORDER BY id DESC
-    """)
-    rows = cursor.fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
-
-# Initialize tables on import
-init_db()
+    data = load_data()
+    return list(reversed(data.get("appointments", [])))

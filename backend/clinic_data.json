@@ -1,0 +1,233 @@
+{
+  "doctors": [
+    {
+      "id": 1,
+      "name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology"
+    },
+    {
+      "id": 2,
+      "name": "Dr. Rajesh Sharma",
+      "specialty": "General Medicine"
+    },
+    {
+      "id": 3,
+      "name": "Dr. Emily Watson",
+      "specialty": "Dermatology"
+    },
+    {
+      "id": 4,
+      "name": "Dr. Michael Chang",
+      "specialty": "Pediatrics"
+    }
+  ],
+  "slots": [
+    {
+      "id": 1,
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "is_booked": false
+    },
+    {
+      "id": 2,
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "is_booked": false
+    },
+    {
+      "id": 3,
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "is_booked": true
+    },
+    {
+      "id": 4,
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "is_booked": false
+    },
+    {
+      "id": 5,
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "is_booked": false
+    },
+    {
+      "id": 6,
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "is_booked": false
+    },
+    {
+      "id": 7,
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "is_booked": false
+    },
+    {
+      "id": 8,
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "is_booked": false
+    },
+    {
+      "id": 9,
+      "doctor_id": 3,
+      "doctor_name": "Dr. Emily Watson",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "is_booked": false
+    },
+    {
+      "id": 10,
+      "doctor_id": 3,
+      "doctor_name": "Dr. Emily Watson",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "is_booked": false
+    },
+    {
+      "id": 11,
+      "doctor_id": 3,
+      "doctor_name": "Dr. Emily Watson",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "is_booked": false
+    },
+    {
+      "id": 12,
+      "doctor_id": 3,
+      "doctor_name": "Dr. Emily Watson",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "is_booked": false
+    },
+    {
+      "id": 13,
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "is_booked": false
+    },
+    {
+      "id": 14,
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "is_booked": false
+    },
+    {
+      "id": 15,
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "is_booked": false
+    },
+    {
+      "id": 16,
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "is_booked": false
+    }
+  ],
+  "appointments": [
+    {
+      "id": 1,
+      "patient_name": "Alex Rivera",
+      "patient_phone": "9876543210",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "status": "CONFIRMED"
+    },
+    {
+      "id": 2,
+      "patient_name": "Caller",
+      "patient_phone": "9988776655",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 3,
+      "patient_name": "Caller",
+      "patient_phone": "7842816423",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "status": "CONFIRMED"
+    },
+    {
+      "id": 4,
+      "patient_name": "Caller",
+      "patient_phone": "7842816423",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 5,
+      "patient_name": "Caller",
+      "patient_phone": "7842816423",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 6,
+      "patient_name": "Caller",
+      "patient_phone": "7842816423",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 7,
+      "patient_name": "Caller",
+      "patient_phone": "7842816423",
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "specialty": "Pediatrics",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "status": "CANCELLED"
+    }
+  ]
+}

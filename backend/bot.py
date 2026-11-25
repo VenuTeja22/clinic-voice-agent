@@ -1,25 +1,33 @@
 import os
-import sys
-import asyncio
-import ssl
 import certifi
+
+# Fix macOS SSL Certificate Verification for all modules
+os.environ["SSL_CERT_FILE"] = certifi.where()
+os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
+os.environ["CURL_CA_BUNDLE"] = certifi.where()
+
 import aiohttp
 from typing import Callable, Optional, Dict, Any
-
-def get_ssl_context():
-    try:
-        return ssl.create_default_context(cafile=certifi.where())
-    except Exception:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        return ctx
+from fastapi import WebSocket
 
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.task import PipelineTask, PipelineParams
 from pipecat.pipeline.runner import PipelineRunner
-from pipecat.transports.daily.transport import DailyTransport, DailyParams
+from pipecat.transports.websocket.fastapi import FastAPIWebsocketTransport, FastAPIWebsocketParams
+from pipecat.serializers.base_serializer import FrameSerializer
+from pipecat.frames.frames import (
+    InputAudioRawFrame,
+    OutputAudioRawFrame,
+    AudioRawFrame,
+    TTSAudioRawFrame,
+    Frame,
+    TranscriptionFrame,
+    TextFrame,
+    TTSSpeakFrame,
+    LLMRunFrame
+)
 from pipecat.audio.vad.silero import SileroVADAnalyzer
+from pipecat.processors.audio.vad_processor import VADProcessor
 from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
 from pipecat.services.elevenlabs.stt import ElevenLabsSTTService
 from pipecat.services.google.llm import GoogleLLMService
@@ -28,7 +36,6 @@ from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema
 from pipecat.processors.frame_processor import FrameProcessor, FrameDirection
-from pipecat.frames.frames import TranscriptionFrame, TextFrame, TTSSpeakFrame
 
 import tools
 
@@ -57,6 +64,18 @@ STRICT CONVERSATIONAL RULES:
 - You can check slots, book, and cancel within the same phone call if the caller requests multiple actions.
 """
 
+class RawAudioSerializer(FrameSerializer):
+    """Serializes raw audio frames to/from WebSocket binary messages."""
+    async def serialize(self, frame: Frame):
+        if isinstance(frame, (OutputAudioRawFrame, AudioRawFrame, TTSAudioRawFrame)):
+            return frame.audio
+        return None
+
+    async def deserialize(self, data: bytes):
+        if isinstance(data, (bytes, bytearray)) and len(data) > 0:
+            return InputAudioRawFrame(audio=bytes(data), sample_rate=16000, num_channels=1)
+        return None
+
 class TranscriptBroadcaster(FrameProcessor):
     def __init__(self, broadcast_fn: Optional[Callable[[Dict[str, Any]], Any]] = None):
         super().__init__()
@@ -64,14 +83,17 @@ class TranscriptBroadcaster(FrameProcessor):
 
     async def process_frame(self, frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
-        if self.broadcast_fn:
-            if isinstance(frame, TranscriptionFrame) and frame.text.strip():
+        if isinstance(frame, TranscriptionFrame) and frame.text.strip():
+            print(f"\n🗣️  [CALLER]: {frame.text.strip()}", flush=True)
+            if self.broadcast_fn:
                 await self.broadcast_fn({
                     "type": "transcript",
                     "speaker": "user",
                     "text": frame.text.strip()
                 })
-            elif isinstance(frame, TextFrame) and frame.text.strip():
+        elif isinstance(frame, TextFrame) and frame.text.strip():
+            print(f"\n🤖 [CURA ASSISTANT]: {frame.text.strip()}", flush=True)
+            if self.broadcast_fn:
                 await self.broadcast_fn({
                     "type": "transcript",
                     "speaker": "assistant",
@@ -79,32 +101,31 @@ class TranscriptBroadcaster(FrameProcessor):
                 })
         await self.push_frame(frame, direction)
 
-async def run_bot(
-    room_url: str,
-    token: Optional[str] = None,
+async def run_websocket_bot(
+    websocket: WebSocket,
     broadcast_fn: Optional[Callable[[Dict[str, Any]], Any]] = None
 ):
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    eleven_key = os.getenv("ELEVENLABS_API_KEY")
-    voice_id = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM") # Rachel
+    gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+    eleven_key = (os.getenv("ELEVENLABS_API_KEY") or "").strip()
+    voice_id = os.getenv("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL").strip() # Bella (Free Tier)
 
     if not gemini_key or not eleven_key:
         raise ValueError("Missing GEMINI_API_KEY or ELEVENLABS_API_KEY in environment.")
 
-    connector = aiohttp.TCPConnector(ssl=get_ssl_context())
-    async with aiohttp.ClientSession(connector=connector) as aiohttp_session:
-        # 1. Transport (Daily WebRTC + Silero VAD)
+    async with aiohttp.ClientSession() as aiohttp_session:
+        # 1. Transport (FastAPI WebSocket + Silero VAD)
         vad = SileroVADAnalyzer()
-        transport = DailyTransport(
-            room_url=room_url,
-            token=token,
-            bot_name="Cura Voice Receptionist",
-            params=DailyParams(
+        transport = FastAPIWebsocketTransport(
+            websocket=websocket,
+            params=FastAPIWebsocketParams(
                 audio_in_enabled=True,
                 audio_out_enabled=True,
+                audio_in_sample_rate=16000,
+                audio_out_sample_rate=24000,
                 vad_enabled=True,
                 vad_analyzer=vad,
-                vad_audio_passthrough=True
+                vad_audio_passthrough=True,
+                serializer=RawAudioSerializer()
             )
         )
 
@@ -123,8 +144,10 @@ async def run_bot(
         # 4. LLM (Google Gemini)
         llm = GoogleLLMService(
             api_key=gemini_key,
-            settings=GoogleLLMService.Settings(model="gemini-2.5-flash"),
-            system_instruction=SYSTEM_INSTRUCTION
+            settings=GoogleLLMService.Settings(
+                model="gemini-3.5-flash-lite",
+                system_instruction=SYSTEM_INSTRUCTION
+            )
         )
 
         # Tool Definitions
@@ -167,15 +190,18 @@ async def run_bot(
         # Register Handlers
         async def handle_check_availability(params):
             args = params.arguments
+            print(f"\n🔧 [TOOL] Checking Availability: {args}", flush=True)
             res = tools.check_doctor_availability(
                 doctor_name=args.get("doctor_name"),
                 date=args.get("date"),
                 specialty=args.get("specialty")
             )
+            print(f"🔧 [TOOL RESULT]: {res.get('message')}", flush=True)
             await params.result_callback(res)
 
         async def handle_book_appointment(params):
             args = params.arguments
+            print(f"\n🔧 [TOOL] Booking Appointment: {args}", flush=True)
             res = tools.book_appointment(
                 patient_phone=args.get("patient_phone", ""),
                 doctor_name=args.get("doctor_name", ""),
@@ -183,13 +209,16 @@ async def run_bot(
                 slot_date=args.get("slot_date"),
                 patient_name=args.get("patient_name")
             )
+            print(f"🔧 [TOOL RESULT]: {res.get('message') or res.get('error')}", flush=True)
             if res.get("success") and broadcast_fn:
                 await broadcast_fn({"type": "database_update", "action": "booked", "data": res})
             await params.result_callback(res)
 
         async def handle_cancel_appointment(params):
             args = params.arguments
+            print(f"\n🔧 [TOOL] Cancelling Appointment: {args}", flush=True)
             res = tools.cancel_appointment(patient_phone=args.get("patient_phone", ""))
+            print(f"🔧 [TOOL RESULT]: {res.get('message') or res.get('error')}", flush=True)
             if res.get("success") and broadcast_fn:
                 await broadcast_fn({"type": "database_update", "action": "cancelled", "data": res})
             await params.result_callback(res)
@@ -202,9 +231,11 @@ async def run_bot(
         user_aggregator = LLMUserAggregator(context)
         assistant_aggregator = LLMAssistantAggregator(context)
         broadcaster = TranscriptBroadcaster(broadcast_fn=broadcast_fn)
+        vad_processor = VADProcessor(vad_analyzer=vad)
 
         pipeline = Pipeline([
             transport.input(),
+            vad_processor,
             stt,
             broadcaster,
             user_aggregator,
@@ -216,12 +247,14 @@ async def run_bot(
 
         task = PipelineTask(pipeline, params=PipelineParams(allow_interruptions=True))
 
-        @transport.event_handler("on_first_participant_joined")
-        async def on_first_participant_joined(transport, participant):
-            greeting = "Hello! Welcome to CuraClinic appointment desk. How may I assist you today?"
-            if broadcast_fn:
-                await broadcast_fn({"type": "transcript", "speaker": "assistant", "text": greeting})
-            await task.queue_frame(TTSSpeakFrame(greeting))
+        @transport.event_handler("on_client_connected")
+        async def on_client_connected(transport, client):
+            print("Client connected via WebSocket, initiating conversation...")
+            context.add_message({
+                "role": "developer",
+                "content": "Greet the caller warmly with 'Hello! Welcome to CuraClinic appointment desk. How may I assist you today?'"
+            })
+            await task.queue_frame(LLMRunFrame())
 
         runner = PipelineRunner()
         await runner.run(task)

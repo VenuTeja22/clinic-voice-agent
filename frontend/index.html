@@ -1,13 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230d9488'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CuraClinic - Voice Appointment Assistant</title>
-  </head>
-  <body class="bg-slate-50 text-slate-800 antialiased selection:bg-teal-100 selection:text-teal-900">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CuraClinic - Voice Appointment Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="container header-container">
+      <div class="brand">
+        <div class="logo-icon">🩺</div>
+        <div>
+          <div class="brand-title">
+            <span>CuraClinic</span>
+            <span class="badge">Voice Assistant</span>
+          </div>
+          <p class="brand-subtitle">Autonomous Doctor Appointment Management</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>Voice Pipeline Ready</span>
+        </div>
+        <button id="startCallBtn" class="btn btn-primary">
+          <span class="phone-icon">📞</span>
+          <span>Start Voice Call</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Content -->
+  <main class="container main-content">
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-content">
+        <span class="hero-tag">✨ Real-time Voice AI Desk</span>
+        <h1>Book & Manage Appointments with Natural Voice</h1>
+        <p>Click <strong>Start Voice Call</strong> to speak directly with Cura, our clinic voice receptionist. State your phone number, check available physician slots, and confirm your booking or cancellation.</p>
+        
+        <div class="steps-row">
+          <div class="step-item"><span class="step-num">1</span> Speak phone number</div>
+          <div class="step-item"><span class="step-num">2</span> Agent confirms & reads back</div>
+          <div class="step-item"><span class="step-num">3</span> Live dashboard auto-update</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Doctors & Available Slots Section -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Physicians & Available Slots</h2>
+          <p class="section-desc">Live schedule synced with clinic directory</p>
+        </div>
+        <span id="doctorsCountBadge" class="badge">4 Doctors on Duty</span>
+      </div>
+      <div id="doctorsGrid" class="doctors-grid">
+        <div class="loading">Loading doctor schedules...</div>
+      </div>
+    </section>
+
+    <!-- Appointments Registry Section -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Live Appointments Registry</h2>
+          <p class="section-desc">Auto-updates in real time when booked or cancelled by voice</p>
+        </div>
+        <span id="appointmentsCountBadge" class="badge-neutral">0 Total</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Patient Phone</th>
+              <th>Doctor</th>
+              <th>Specialty</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="appointmentsTableBody">
+            <tr><td colspan="5" class="loading">Loading appointments...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>CuraClinic Voice Agent • Built with Pipecat, ElevenLabs STT/TTS, Google Gemini, and Daily WebRTC</p>
+  </footer>
+
+  <!-- Phone Call Overlay Modal (Bonus Feature) -->
+  <div id="phoneModal" class="modal-overlay hidden">
+    <div class="phone-frame">
+      <!-- Notch / Island -->
+      <div class="phone-notch">
+        <div class="notch-camera"></div>
+        <div class="notch-led"></div>
+      </div>
+
+      <!-- Call Screen Header -->
+      <div class="phone-header">
+        <div class="avatar-circle">🎙️</div>
+        <h3 class="caller-name">Cura AI Receptionist</h3>
+        <p class="clinic-sub">CuraClinic Voice Desk</p>
+
+        <div class="call-status-wrapper">
+          <span id="callStatusText" class="call-status">Connecting audio...</span>
+        </div>
+
+        <!-- Waveform Activity -->
+        <div class="waveform-container">
+          <span class="wave-bar w1"></span>
+          <span class="wave-bar w2"></span>
+          <span class="wave-bar w3"></span>
+          <span class="wave-bar w4"></span>
+          <span class="wave-bar w5"></span>
+        </div>
+      </div>
+
+      <!-- Action Confirmation Toast -->
+      <div id="actionToast" class="action-toast hidden">
+        <span class="toast-icon">✓</span>
+        <span id="actionToastText">Appointment Confirmed</span>
+      </div>
+
+      <!-- Live Transcripts -->
+      <div id="transcriptBox" class="transcript-box">
+        <div class="transcript-placeholder">
+          Say hello or ask for available appointments.<br>
+          <small>e.g. "Hi, what doctors are available tomorrow?"</small>
+        </div>
+      </div>
+
+      <!-- Call Controls -->
+      <div class="phone-controls">
+        <button id="muteBtn" class="control-btn mute-btn" title="Mute Microphone">
+          🎤
+        </button>
+        <button id="endCallBtn" class="control-btn end-btn" title="End Call">
+          📞
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
 </html>
