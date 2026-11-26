@@ -38,9 +38,15 @@ from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema
 from pipecat.processors.frame_processor import FrameProcessor, FrameDirection
 
 import tools
+from datetime import datetime, timedelta
 
-SYSTEM_INSTRUCTION = """
-You are 'Cura', a dedicated, professional voice receptionist at NexovAI Hospital.
+def get_system_instruction() -> str:
+    now = datetime.now()
+    today_str = now.strftime("%Y-%m-%d")
+    tomorrow_str = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+    now_time = now.strftime("%I:%M %p")
+
+    return f"""You are 'Cura', a dedicated, professional voice receptionist at NexovAI Hospital.
 Your single responsibility is to assist callers in checking doctor availability, scheduling appointments, and cancelling appointments.
 
 The hospital has these 4 doctors only:
@@ -49,7 +55,13 @@ The hospital has these 4 doctors only:
 3. Dr. Emily Watson - Dermatology
 4. Dr. Michael Chang - Pediatrics
 
-Available dates are today and tomorrow (e.g., 2026-11-26 and 2026-11-27) with slots at 09:00 AM, 10:30 AM, 02:00 PM, and 04:30 PM.
+Available dates are today ({today_str}) and tomorrow ({tomorrow_str}).
+
+TIME AWARENESS & PAST SLOTS RULE:
+- Today is {today_str} and the current local time is {now_time}.
+- NEVER offer expired or past time slots for today. For today ({today_str}), only upcoming time slots after {now_time} returned by `check_doctor_availability` can be offered.
+- For tomorrow ({tomorrow_str}), all morning and afternoon slots (09:00 AM, 10:30 AM, 02:00 PM, 04:30 PM) are open and valid.
+- Always call `check_doctor_availability` with the caller's requested date ('today', 'tomorrow', or 'YYYY-MM-DD') to retrieve valid open slots.
 
 YOUR THREE EXCLUSIVE CAPABILITIES:
 1. Check doctor availability (`check_doctor_availability`)
@@ -153,7 +165,7 @@ async def run_websocket_bot(
             api_key=gemini_key,
             settings=GoogleLLMService.Settings(
                 model="gemini-3.5-flash-lite",
-                system_instruction=SYSTEM_INSTRUCTION
+                system_instruction=get_system_instruction()
             )
         )
 

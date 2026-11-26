@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from database import load_data, save_data
 
@@ -6,18 +7,45 @@ def normalize_phone(phone: str) -> str:
     """Strip spaces, dashes, parentheses to clean standard digits."""
     return re.sub(r"[^\d+]", "", phone)
 
+def parse_slot_datetime(date_str: str, time_str: str) -> Optional[datetime]:
+    """Parse slot date and time into a datetime object for comparison."""
+    try:
+        clean_time = time_str.strip().upper()
+        return datetime.strptime(f"{date_str.strip()} {clean_time}", "%Y-%m-%d %I:%M %p")
+    except Exception:
+        return None
+
+def resolve_date_input(date_input: Optional[str]) -> Optional[str]:
+    """Resolve human date inputs like 'today', 'tomorrow', or 'YYYY-MM-DD'."""
+    if not date_input:
+        return None
+    d = date_input.lower().strip()
+    now = datetime.now()
+    if d in ["today", "now", "tonight"]:
+        return now.strftime("%Y-%m-%d")
+    elif d in ["tomorrow", "tmrw"]:
+        return (now + timedelta(days=1)).strftime("%Y-%m-%d")
+    return date_input.strip()
+
 def check_doctor_availability(doctor_name: Optional[str] = None, date: Optional[str] = None, specialty: Optional[str] = None) -> Dict[str, Any]:
     """
     Returns available open slots for doctors matching the criteria from the JSON store.
+    Automatically filters out past time slots if the query is for today.
     """
     data = load_data()
     slots = data.get("slots", [])
     doctors = {d["id"]: d for d in data.get("doctors", [])}
 
+    now = datetime.now()
+    target_date = resolve_date_input(date)
+
     matching = []
+    past_slots_count = 0
+
     for s in slots:
         if s.get("is_booked"):
             continue
+
         doc = doctors.get(s["doctor_id"], {})
         d_name = doc.get("name", "")
         d_spec = doc.get("specialty", "")
@@ -26,7 +54,13 @@ def check_doctor_availability(doctor_name: Optional[str] = None, date: Optional[
             continue
         if specialty and specialty.lower().strip() not in d_spec.lower():
             continue
-        if date and date.strip() != s.get("date", "").strip():
+        if target_date and target_date != s.get("date", "").strip():
+            continue
+
+        # Check if slot has already passed
+        slot_dt = parse_slot_datetime(s.get("date", ""), s.get("time", ""))
+        if slot_dt and slot_dt <= now:
+            past_slots_count += 1
             continue
 
         matching.append({
@@ -38,9 +72,19 @@ def check_doctor_availability(doctor_name: Optional[str] = None, date: Optional[
         })
 
     if not matching:
+        today_str = now.strftime("%Y-%m-%d")
+        tomorrow_str = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+
+        if target_date == today_str and past_slots_count > 0:
+            return {
+                "success": False,
+                "message": f"All earlier slots for today have already passed. Open slots are available tomorrow ({tomorrow_str}) starting at 09:00 AM. Would you like to check tomorrow?",
+                "slots": []
+            }
+
         return {
             "success": False,
-            "message": "No open slots found matching your request. Would you like to check another doctor, specialty, or date?",
+            "message": "No open upcoming slots found matching your request. Would you like to check another doctor, specialty, or date?",
             "slots": []
         }
 
@@ -48,12 +92,13 @@ def check_doctor_availability(doctor_name: Optional[str] = None, date: Optional[
         "success": True,
         "count": len(matching),
         "slots": matching[:6],
-        "message": f"Found {len(matching)} available slots."
+        "message": f"Found {len(matching)} available upcoming slots."
     }
 
 def book_appointment(patient_phone: str, doctor_name: str, slot_time: str, slot_date: Optional[str] = None, patient_name: Optional[str] = None) -> Dict[str, Any]:
     """
     Books an appointment in JSON store using the confirmed phone number.
+    Ensures that past time slots cannot be booked.
     """
     clean_phone = normalize_phone(patient_phone)
     if not clean_phone or len(clean_phone) < 7:
@@ -80,12 +125,15 @@ def book_appointment(patient_phone: str, doctor_name: str, slot_time: str, slot_
             "error": f"Doctor '{doctor_name}' was not found in our clinic directory."
         }
 
+    target_date = resolve_date_input(slot_date)
+    now = datetime.now()
+
     # Find unbooked slot
     target_slot = None
     for s in slots:
         if s["doctor_id"] == target_doc["id"] and not s.get("is_booked"):
             time_match = slot_time.lower().strip() in s["time"].lower() or slot_time.strip() == s["time"]
-            date_match = (slot_date.strip() == s["date"]) if slot_date else True
+            date_match = (target_date == s["date"]) if target_date else True
             if time_match and date_match:
                 target_slot = s
                 break
@@ -94,6 +142,14 @@ def book_appointment(patient_phone: str, doctor_name: str, slot_time: str, slot_
         return {
             "success": False,
             "error": f"The requested slot ({slot_time}) is not available with {target_doc['name']}."
+        }
+
+    # Ensure slot is not in the past
+    slot_dt = parse_slot_datetime(target_slot["date"], target_slot["time"])
+    if slot_dt and slot_dt <= now:
+        return {
+            "success": False,
+            "error": f"The slot at {target_slot['time']} on {target_slot['date']} has already passed. Please select an upcoming slot."
         }
 
     # Mark slot booked

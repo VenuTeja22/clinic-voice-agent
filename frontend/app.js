@@ -49,20 +49,53 @@ async function fetchAppointments() {
   }
 }
 
+function isSlotPast(dateStr, timeStr) {
+  try {
+    const slotDate = new Date(`${dateStr} ${timeStr}`);
+    return slotDate <= new Date();
+  } catch (e) {
+    return false;
+  }
+}
+
 function renderDoctors(doctors) {
   if (!doctorsGrid) return;
   doctorsGrid.innerHTML = '';
 
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+  const tmrw = new Date(now);
+  tmrw.setDate(tmrw.getDate() + 1);
+  const tomorrowStr = `${tmrw.getFullYear()}-${pad(tmrw.getMonth() + 1)}-${pad(tmrw.getDate())}`;
+
   doctors.forEach((doc) => {
-    const availableSlots = (doc.slots || []).filter((s) => !s.is_booked);
+    // Only display active slots for today and tomorrow
+    const activeDocSlots = (doc.slots || []).filter(
+      (s) => s.date === todayStr || s.date === tomorrowStr
+    );
+    const availableUpcomingSlots = activeDocSlots.filter(
+      (s) => !s.is_booked && !isSlotPast(s.date, s.time)
+    );
     const card = document.createElement('div');
     card.className = 'doctor-card';
 
-    const slotPills = (doc.slots || [])
-      .map(
-        (s) =>
-          `<span class="slot-pill ${s.is_booked ? 'booked' : 'available'}">${s.time}</span>`
-      )
+    const slotPills = activeDocSlots
+      .map((s) => {
+        const isPast = isSlotPast(s.date, s.time);
+        let statusClass = 'available';
+        let titleExtra = '';
+        if (s.is_booked) {
+          statusClass = 'booked';
+          titleExtra = ' (Booked)';
+        } else if (isPast) {
+          statusClass = 'past';
+          titleExtra = ' (Passed)';
+        }
+        const dayLabel = s.date === tomorrowStr ? 'Tomorrow' : 'Today';
+        return `<span class="slot-pill ${statusClass}" title="${s.date} ${s.time}${titleExtra}">${dayLabel} ${s.time}</span>`;
+      })
       .join('');
 
     card.innerHTML = `
@@ -72,10 +105,10 @@ function renderDoctors(doctors) {
             <div class="doc-name">${doc.name}</div>
             <div class="doc-spec">${doc.specialty}</div>
           </div>
-          <span class="badge">${availableSlots.length} open</span>
+          <span class="badge">${availableUpcomingSlots.length} open</span>
         </div>
         <div class="slots-container">
-          <div class="slots-label">Upcoming Slots (Nov 26)</div>
+          <div class="slots-label">Doctor Schedule (Today & Tomorrow)</div>
           <div class="slot-pills">${slotPills}</div>
         </div>
       </div>

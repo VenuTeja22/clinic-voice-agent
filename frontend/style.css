@@ -528,6 +528,14 @@ body.nexov-dark {
   text-decoration: line-through;
 }
 
+.slot-pill.past {
+  background: rgba(255, 255, 255, 0.02);
+  color: #4b5563;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
 /* Table */
 .table-wrapper {
   overflow-x: auto;

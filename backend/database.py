@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "clinic_data.json")
@@ -29,31 +30,61 @@ INITIAL_DATA = {
         {"id": 15, "doctor_id": 4, "doctor_name": "Dr. Michael Chang", "date": "2026-11-26", "time": "02:00 PM", "is_booked": False},
         {"id": 16, "doctor_id": 4, "doctor_name": "Dr. Michael Chang", "date": "2026-11-26", "time": "04:30 PM", "is_booked": False}
     ],
-    "appointments": [
-        {
-            "id": 1,
-            "patient_name": "Alex Rivera",
-            "patient_phone": "9876543210",
-            "doctor_id": 1,
-            "doctor_name": "Dr. Sarah Jenkins",
-            "specialty": "Cardiology",
-            "date": "2026-11-26",
-            "time": "09:00 AM",
-            "status": "CONFIRMED"
-        }
-    ]
+    "appointments": []
 }
+
+def ensure_active_dates(data: Dict[str, Any]) -> bool:
+    """Ensures that slots for today and tomorrow always exist in the database dynamically."""
+    now = datetime.now()
+    today = now.strftime("%Y-%m-%d")
+    tomorrow = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    slots = data.get("slots", [])
+    doctors = data.get("doctors", [])
+    times = ["09:00 AM", "10:30 AM", "02:00 PM", "04:30 PM"]
+
+    existing_keys = set((s.get("doctor_id"), s.get("date"), s.get("time")) for s in slots)
+    current_max_id = max((s.get("id", 0) for s in slots), default=0)
+
+    modified = False
+    new_slots = []
+    for d in [today, tomorrow]:
+        for doc in doctors:
+            for t in times:
+                key = (doc["id"], d, t)
+                if key not in existing_keys:
+                    current_max_id += 1
+                    new_slots.append({
+                        "id": current_max_id,
+                        "doctor_id": doc["id"],
+                        "doctor_name": doc["name"],
+                        "date": d,
+                        "time": t,
+                        "is_booked": False
+                    })
+                    existing_keys.add(key)
+                    modified = True
+
+    if modified:
+        slots.extend(new_slots)
+        data["slots"] = slots
+        save_data(data)
+    return modified
 
 def load_data() -> Dict[str, Any]:
     if not os.path.exists(DATA_FILE):
         save_data(INITIAL_DATA)
-        return INITIAL_DATA
-    try:
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
-    except Exception:
-        save_data(INITIAL_DATA)
-        return INITIAL_DATA
+        data = INITIAL_DATA
+    else:
+        try:
+            with open(DATA_FILE, "r") as f:
+                data = json.load(f)
+        except Exception:
+            save_data(INITIAL_DATA)
+            data = INITIAL_DATA
+
+    ensure_active_dates(data)
+    return data
 
 def save_data(data: Dict[str, Any]):
     with open(DATA_FILE, "w") as f:
