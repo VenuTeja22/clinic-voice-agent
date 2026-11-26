@@ -1,0 +1,270 @@
+@startuml NexovCare_Voice_Agent_Workflow
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam handwritten false
+skinparam roundcorner 8
+skinparam defaultFontName "Helvetica", "Arial", sans-serif
+skinparam defaultFontSize 12
+
+skinparam sequence {
+    ArrowColor #0284C7
+    ActorBorderColor #0284C7
+    LifeLineBorderColor #CBD5E1
+    LifeLineBackgroundColor #F1F5F9
+    ParticipantBorderColor #0284C7
+    ParticipantBackgroundColor #F0F9FF
+    ParticipantFontColor #0F172A
+    ParticipantFontStyle bold
+    BoxBorderColor #94A3B8
+    BoxBackgroundColor #F8FAFC
+}
+
+skinparam note {
+    BackgroundColor #FEF3C7
+    BorderColor #F59E0B
+    FontColor #92400E
+}
+
+title NexovCare Hospital - Voice AI Workflow & Pipeline Architecture
+
+actor "Patient / Caller" as Patient #E0F2FE
+participant "Browser Call Console" as Browser #E0F2FE
+participant "WebSocket Gateway\n(/ws/call)" as Gateway #F0F9FF
+participant "Silero VAD\n(ONNX Runtime)" as VAD #F0F9FF
+participant "ElevenLabs STT\n(Real-Time)" as STT #F0F9FF
+participant "Google Gemini 3.5\nFlash Lite (LLM)" as LLM #FEF9C3
+participant "Pipecat Tools\n(tools.py)" as Tools #FEF9C3
+database "JSON Store\n(clinic_data.json)" as DB #ECFDF5
+participant "ElevenLabs TTS\n(Neural Bella)" as TTS #FDF2F8
+participant "Live Dashboard\n(/ws Broadcast)" as Dashboard #ECFDF5
+
+== 1. Call Connection & Full-Duplex Pipeline Initialization ==
+
+Patient -> Browser : Clicks Start Call
+activate Browser
+Browser -> Gateway : Connect WebSocket (/ws/call)
+activate Gateway
+Gateway -> TTS : Synthesize Welcome Greeting
+activate TTS
+TTS -> Gateway : Stream 24kHz PCM Audio Frames
+deactivate TTS
+Gateway -> Browser : Binary Audio Stream
+Browser -> Patient : Speaks welcome greeting to caller
+
+== 2. Natural Voice Query & Voice Activity Detection ==
+
+Patient -> Browser : Speaks: I would like to book Dr. Sarah Jenkins tomorrow
+Browser -> Gateway : Stream 16kHz 16-bit Mono PCM
+Gateway -> VAD : Stream raw audio frames
+activate VAD
+VAD -> VAD : Detect End-of-Speech boundary
+VAD -> STT : Forward speech frame chunk
+deactivate VAD
+activate STT
+STT -> Gateway : Transcribed text
+deactivate STT
+
+Gateway -> Dashboard : Broadcast user transcript event
+Dashboard -> Dashboard : Render caller message in live transcript feed
+
+== 3. Conversational Reasoning & Availability Check ==
+
+Gateway -> LLM : User utterance + conversational history + tools
+activate LLM
+LLM -> Tools : check_doctor_availability(doctor_name, date)
+activate Tools
+Tools -> DB : Query active doctor slots and leave status
+activate DB
+DB --> Tools : Return matching slots
+deactivate DB
+
+alt Doctor is On Leave (e.g. Dr. David Miller)
+    Tools --> LLM : Doctor is on scheduled leave (0 slots available)
+    LLM -> TTS : Synthesize: Dr. Miller is on leave. Would you like another specialist?
+    activate TTS
+    TTS -> Gateway : 24kHz PCM stream
+    deactivate TTS
+    Gateway -> Browser : Binary audio frames
+    Browser -> Patient : Informs caller doctor is on leave
+else Doctor is Available (e.g. Dr. Sarah Jenkins)
+    Tools --> LLM : Available slots found (09:00 AM, 10:30 AM, 02:00 PM)
+    LLM -> TTS : Synthesize: Dr. Jenkins has slots at 9:00 AM, 10:30 AM, 2:00 PM. Which works?
+    activate TTS
+    TTS -> Gateway : 24kHz PCM stream
+    deactivate TTS
+    Gateway -> Browser : Binary audio frames
+    Browser -> Patient : Speaks available slots to caller
+end
+deactivate Tools
+deactivate LLM
+
+== 4. Slot Selection & Mandatory Phone Read-Back Confirmation ==
+
+Patient -> Browser : Speaks: 10:30 AM. My phone number is 9876543210
+Browser -> Gateway : Stream audio frames
+Gateway -> VAD : Voice frame detection
+activate VAD
+VAD -> STT : Forward speech chunk
+deactivate VAD
+activate STT
+STT -> Gateway : Transcribed: 10:30 AM, phone 9876543210
+deactivate STT
+
+Gateway -> LLM : Transcribed slot choice and phone number
+activate LLM
+
+note over LLM, Patient
+  Clinical Guardrail:
+  The agent MUST read back the phone number
+  and require explicit caller confirmation
+  prior to executing database mutations.
+end note
+
+LLM -> TTS : Synthesize: Confirming 10:30 AM. Phone is 98765-43210. Is that correct?
+activate TTS
+TTS -> Gateway : 24kHz PCM stream
+deactivate TTS
+Gateway -> Browser : Binary audio frames
+Browser -> Patient : Speaks read-back verification
+
+Patient -> Browser : Speaks: Yes, that is correct
+Browser -> Gateway : Stream confirmation audio
+Gateway -> VAD : Voice frame detection
+activate VAD
+VAD -> STT : Forward speech chunk
+deactivate VAD
+activate STT
+STT -> Gateway : Transcribed: Yes, that is correct
+deactivate STT
+Gateway -> LLM : Confirmed by caller
+
+== 5. Booking Execution & Real-Time Dashboard Sync ==
+
+LLM -> Tools : book_appointment(phone, doctor, time, date)
+activate Tools
+Tools -> DB : Mark slot booked, write appointment record
+activate DB
+DB --> Tools : Booking confirmed (APT-XXXX)
+deactivate DB
+Tools --> LLM : Return success and appointment payload
+deactivate Tools
+
+LLM -> TTS : Synthesize: Consultation confirmed for tomorrow at 10:30 AM
+activate TTS
+TTS -> Gateway : 24kHz PCM stream
+deactivate TTS
+deactivate LLM
+
+Gateway -> Browser : Binary audio frames
+Browser -> Patient : Speaks booking confirmation
+
+Gateway -> Dashboard : Broadcast appointment_created event via /ws
+activate Dashboard
+Dashboard -> Dashboard : Decrement doctor open slot badge\nAppend new row to Patient Appointment Ledger in real time
+deactivate Dashboard
+
+== 6. Multi-Appointment Cancellation Flow (Disambiguation) ==
+
+opt Patient Calls to Cancel Consultation
+    Patient -> Browser : Speaks: I want to cancel my appointment
+    Browser -> Gateway : Stream audio
+    Gateway -> VAD : Audio frames
+    activate VAD
+    VAD -> STT : Speech chunk
+    deactivate VAD
+    activate STT
+    STT -> Gateway : Transcribed cancellation request
+    deactivate STT
+    Gateway -> LLM : Caller wants to cancel
+    activate LLM
+    LLM -> TTS : Synthesize: Please provide your registered phone number
+    activate TTS
+    TTS -> Gateway : Stream audio
+    deactivate TTS
+    Gateway -> Browser : Audio frames
+    Browser -> Patient : Asks caller for phone number
+
+    Patient -> Browser : Speaks: 9876543210
+    Browser -> Gateway : Stream audio
+    Gateway -> VAD : Audio frames
+    activate VAD
+    VAD -> STT : Speech chunk
+    deactivate VAD
+    activate STT
+    STT -> Gateway : Transcribed: 9876543210
+    deactivate STT
+    Gateway -> LLM : Caller phone number
+
+    LLM -> Tools : Query appointments for phone 9876543210
+    activate Tools
+    Tools -> DB : Fetch all active bookings for 9876543210
+    activate DB
+    DB --> Tools : Return active bookings list
+    deactivate DB
+    Tools --> LLM : Return appointments list
+    deactivate Tools
+
+    alt Multiple Active Bookings Found
+        note over LLM, Patient
+          Multi-Appointment Disambiguation:
+          Agent detects 2 or more bookings under the same phone
+          and asks the caller to specify which one to cancel.
+        end note
+        LLM -> TTS : Synthesize: Found 2 appointments. Which one would you like to cancel?
+        activate TTS
+        TTS -> Gateway : Stream audio
+        deactivate TTS
+        Gateway -> Browser : Audio frames
+        Browser -> Patient : Reads matching appointments
+        Patient -> Browser : Speaks: Cancel the one with Dr. Jenkins
+        Browser -> Gateway : Stream selection
+        Gateway -> VAD : Audio frames
+        activate VAD
+        VAD -> STT : Speech chunk
+        deactivate VAD
+        activate STT
+        STT -> Gateway : Transcribed selection
+        deactivate STT
+        Gateway -> LLM : Selected appointment
+    end
+
+    LLM -> TTS : Synthesize: Confirming cancellation for Dr. Jenkins. Correct?
+    activate TTS
+    TTS -> Gateway : Stream audio
+    deactivate TTS
+    Gateway -> Browser : Audio frames
+    Browser -> Patient : Reads back cancellation confirmation
+    Patient -> Browser : Speaks: Yes
+
+    LLM -> Tools : cancel_appointment(phone, doctor, time, date)
+    activate Tools
+    Tools -> DB : Set is_booked=false, update appointment status to cancelled
+    activate DB
+    DB --> Tools : Cancellation confirmed
+    deactivate DB
+    Tools --> LLM : Return success
+    deactivate Tools
+
+    LLM -> TTS : Synthesize: Your appointment has been cancelled successfully
+    activate TTS
+    TTS -> Gateway : Stream audio
+    deactivate TTS
+    deactivate LLM
+    Gateway -> Browser : Audio frames
+    Browser -> Patient : Speaks cancellation confirmation
+
+    Gateway -> Dashboard : Broadcast appointment_cancelled event via /ws
+    activate Dashboard
+    Dashboard -> Dashboard : Increment doctor open slot count\nUpdate status to Cancelled in Patient Ledger
+    deactivate Dashboard
+end
+
+== 7. Call Teardown ==
+
+Patient -> Browser : Clicks End Call or hangs up
+Browser -> Gateway : Close WebSocket connection
+deactivate Browser
+Gateway -> Gateway : Teardown Pipecat audio pipeline
+deactivate Gateway
+
+@enduml

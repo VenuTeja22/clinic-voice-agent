@@ -39,6 +39,18 @@ def check_doctor_availability(doctor_name: Optional[str] = None, date: Optional[
     now = datetime.now()
     target_date = resolve_date_input(date)
 
+    # Check if specifically requested doctor is on leave
+    if doctor_name:
+        for d in doctors.values():
+            if doctor_name.lower().strip() in d.get("name", "").lower():
+                if d.get("on_leave"):
+                    return {
+                        "success": False,
+                        "on_leave": True,
+                        "message": f"{d['name']} ({d.get('specialty')}) is currently on scheduled leave and not taking appointments today or tomorrow. Would you like to consult another specialist?",
+                        "slots": []
+                    }
+
     matching = []
     past_slots_count = 0
 
@@ -123,6 +135,12 @@ def book_appointment(patient_phone: str, doctor_name: str, slot_time: str, slot_
         return {
             "success": False,
             "error": f"Doctor '{doctor_name}' was not found in our clinic directory."
+        }
+
+    if target_doc.get("on_leave"):
+        return {
+            "success": False,
+            "error": f"{target_doc['name']} ({target_doc.get('specialty')}) is currently on scheduled leave and cannot accept appointments."
         }
 
     target_date = resolve_date_input(slot_date)

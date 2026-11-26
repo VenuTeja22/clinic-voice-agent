@@ -7,10 +7,12 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "clinic_data.json")
 
 INITIAL_DATA = {
     "doctors": [
-        {"id": 1, "name": "Dr. Sarah Jenkins", "specialty": "Cardiology"},
-        {"id": 2, "name": "Dr. Rajesh Sharma", "specialty": "General Medicine"},
-        {"id": 3, "name": "Dr. Emily Watson", "specialty": "Dermatology"},
-        {"id": 4, "name": "Dr. Michael Chang", "specialty": "Pediatrics"}
+        {"id": 1, "name": "Dr. Sarah Jenkins", "specialty": "Cardiology", "on_leave": False},
+        {"id": 2, "name": "Dr. Rajesh Sharma", "specialty": "General Medicine", "on_leave": False},
+        {"id": 3, "name": "Dr. Emily Watson", "specialty": "Dermatology", "on_leave": False},
+        {"id": 4, "name": "Dr. Michael Chang", "specialty": "Pediatrics", "on_leave": False},
+        {"id": 5, "name": "Dr. Ananya Iyer", "specialty": "Orthopedics", "on_leave": False},
+        {"id": 6, "name": "Dr. David Miller", "specialty": "Neurology", "on_leave": True}
     ],
     "slots": [
         {"id": 1, "doctor_id": 1, "doctor_name": "Dr. Sarah Jenkins", "date": "2026-11-26", "time": "09:00 AM", "is_booked": False},
@@ -50,6 +52,8 @@ def ensure_active_dates(data: Dict[str, Any]) -> bool:
     new_slots = []
     for d in [today, tomorrow]:
         for doc in doctors:
+            if doc.get("on_leave"):
+                continue  # Skip generating consultation slots for doctor on leave
             for t in times:
                 key = (doc["id"], d, t)
                 if key not in existing_keys:
@@ -108,6 +112,7 @@ def get_all_doctors_with_slots() -> List[Dict[str, Any]]:
             "id": doc["id"],
             "name": doc["name"],
             "specialty": doc["specialty"],
+            "on_leave": doc.get("on_leave", False),
             "slots": doc_slots
         })
     return results

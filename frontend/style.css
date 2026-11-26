@@ -1,20 +1,48 @@
-/* Nexov AI Design System (https://www.nexovai.in/) */
+/* ==========================================================================
+   NexovCare Hospital — Professional Clinical Medical Design System
+   Pristine Medical White & Slate, Trust Sapphire Blue & Emergency Crimson
+   ========================================================================== */
+
 :root {
-  --nexov-bg: #070a09;
-  --nexov-card-bg: rgba(14, 21, 18, 0.7);
-  --nexov-card-border: rgba(103, 252, 198, 0.14);
-  --nexov-card-hover: rgba(103, 252, 198, 0.28);
-  --nexov-mint: #67fcc6;
-  --nexov-mint-glow: rgba(103, 252, 198, 0.35);
-  --nexov-emerald: #10b981;
-  --nexov-cyan: #06b6d4;
-  --nexov-text-bright: #f8fafc;
-  --nexov-text-muted: #94a3b8;
-  --nexov-text-dim: #64748b;
-  --nexov-danger: #f43f5e;
-  --nexov-danger-glow: rgba(244, 63, 94, 0.35);
-  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-space: 'Space Grotesk', sans-serif;
+  /* Medical Healthcare Palette */
+  --hospital-bg: #f8fafc;
+  --hospital-bg-subtle: #f1f5f9;
+  --hospital-card-bg: #ffffff;
+  --hospital-card-border: #e2e8f0;
+  --hospital-card-hover: #cbd5e1;
+  --hospital-card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --hospital-card-shadow-hover: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+
+  /* Clinical Trust Colors */
+  --hospital-primary: #0284c7;        /* Medical Sapphire Blue */
+  --hospital-primary-dark: #0369a1;   /* Deep Ocean Blue */
+  --hospital-primary-light: #e0f2fe;  /* Ice Blue Tint */
+  --hospital-primary-border: #bae6fd;
+  
+  --hospital-teal: #0d9488;           /* Clinical Teal */
+  --hospital-teal-light: #ccfbf1;
+  
+  --hospital-emerald: #10b981;        /* In-Clinic / Confirmed */
+  --hospital-emerald-dark: #065f46;
+  --hospital-emerald-light: #ecfdf5;
+  --hospital-emerald-border: #a7f3d0;
+
+  --hospital-crimson: #dc2626;        /* Emergency Care / Cancelled */
+  --hospital-crimson-dark: #b91c1c;
+  --hospital-crimson-light: #fef2f2;
+  --hospital-crimson-border: #fecaca;
+
+  --hospital-amber: #d97706;          /* Rating / Pending */
+  --hospital-amber-light: #fffbeb;
+
+  /* Typography */
+  --hospital-text-main: #0f172a;       /* Deep Slate Heading */
+  --hospital-text-body: #334155;       /* Readable Slate Body */
+  --hospital-text-muted: #64748b;      /* Secondary Subtext */
+  --hospital-text-dim: #94a3b8;        /* Subtle Captions */
+
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-space: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -23,9 +51,9 @@
   padding: 0;
 }
 
-body.nexov-dark {
-  background-color: var(--nexov-bg);
-  color: var(--nexov-text-bright);
+body.hospital-theme {
+  background-color: var(--hospital-bg);
+  color: var(--hospital-text-body);
   font-family: var(--font-inter);
   line-height: 1.5;
   min-height: 100vh;
@@ -36,60 +64,91 @@ body.nexov-dark {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Ambient Neon Glow Meshes */
-.ambient-glow {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  filter: blur(140px);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.18;
-}
-
-.glow-top-left {
-  top: -150px;
-  left: -150px;
-  background: radial-gradient(circle, var(--nexov-mint) 0%, #006064 70%);
-}
-
-.glow-top-right {
-  top: -100px;
-  right: -150px;
-  background: radial-gradient(circle, #059669 0%, #022c22 80%);
-}
-
-.grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-}
-
 /* Layout Container */
 .main-container {
   max-width: 1140px;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem 4rem 1.25rem;
+  padding: 2rem 1.25rem 3.5rem 1.25rem;
   width: 100%;
   position: relative;
   z-index: 10;
   flex: 1;
 }
 
-/* Navbar */
+/* ==========================================================================
+   1. Emergency & Clinical Status Ribbon (Authoritative Hospital Banner)
+   ========================================================================== */
+.hospital-ticker {
+  background: var(--hospital-crimson-dark);
+  color: #ffffff;
+  padding: 8px 1.25rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 60;
+  box-shadow: 0 2px 8px rgba(185, 28, 28, 0.25);
+}
+
+.ticker-content {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  letter-spacing: 0.02em;
+}
+
+.ticker-alert {
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.alert-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff;
+  animation: hospital-blink 1.2s infinite;
+}
+
+@keyframes hospital-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+.ticker-sep {
+  opacity: 0.45;
+}
+
+.ticker-badge {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  padding: 2px 9px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   2. Clinical Navigation Bar
+   ========================================================================== */
 .navbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(7, 10, 9, 0.75);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--hospital-card-border);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 .nav-container {
@@ -105,117 +164,79 @@ body.nexov-dark {
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.brand-badge-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--nexov-mint);
-  box-shadow: 0 0 12px var(--nexov-mint);
+.medical-cross-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--hospital-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  box-shadow: 0 3px 12px rgba(2, 132, 199, 0.35);
+}
+
+.brand-text-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .brand-text {
   font-family: var(--font-space);
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--nexov-text-bright);
+  letter-spacing: -0.02em;
+  color: var(--hospital-text-main);
 }
 
-.text-mint {
-  color: var(--nexov-mint);
-  text-shadow: 0 0 14px rgba(103, 252, 198, 0.4);
+.brand-sub {
+  font-size: 0.68rem;
+  color: var(--hospital-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-top: -2px;
 }
 
-.nav-pill {
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: rgba(103, 252, 198, 0.08);
-  color: var(--nexov-mint);
-  border: 1px solid rgba(103, 252, 198, 0.2);
+.text-blue {
+  color: var(--hospital-primary);
 }
 
-.nav-center-metrics {
+.nav-center-badges {
   display: none;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-@media (min-width: 768px) {
-  .nav-center-metrics {
+@media (min-width: 820px) {
+  .nav-center-badges {
     display: flex;
   }
 }
 
-.metric-chip {
+.nav-pill-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 5px 12px;
+  background: var(--hospital-bg-subtle);
+  border: 1px solid var(--hospital-card-border);
+  padding: 5px 13px;
   border-radius: 9999px;
-  font-size: 0.72rem;
-  color: var(--nexov-text-muted);
+  font-size: 0.74rem;
+  color: var(--hospital-text-body);
+  font-weight: 500;
 }
 
-.dot-pulse {
+.pill-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--nexov-mint);
-  box-shadow: 0 0 8px var(--nexov-mint);
-  animation: nexov-blink 1.8s infinite;
-}
-
-@keyframes nexov-blink {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-.chip-val {
-  color: var(--nexov-mint);
-  font-weight: 700;
-  font-family: monospace;
-}
-
-.chip-lbl {
-  font-size: 0.7rem;
-  color: var(--nexov-text-dim);
-}
-
-/* Nexov Mint Glow Button */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: var(--font-inter);
-}
-
-.btn-mint-glow {
-  background: var(--nexov-mint);
-  color: #042118;
-  font-weight: 700;
-  box-shadow: 0 0 24px rgba(103, 252, 198, 0.35);
-}
-
-.btn-mint-glow:hover {
-  background: #7efed1;
-  box-shadow: 0 0 32px rgba(103, 252, 198, 0.55);
-  transform: translateY(-1px);
+  background: var(--hospital-emerald);
+  box-shadow: 0 0 6px var(--hospital-emerald);
 }
 
 .call-icon {
@@ -229,15 +250,39 @@ body.nexov-dark {
   display: block;
 }
 
-.pulse-icon {
-  font-size: 9px;
-  animation: nexov-blink 1.2s infinite;
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-inter);
 }
 
-/* Hero Section */
+.btn-hospital-call {
+  background: linear-gradient(135deg, var(--hospital-primary) 0%, var(--hospital-primary-dark) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+}
+
+.btn-hospital-call:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #075985 100%);
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   3. Hero Section & Department Highlights
+   ========================================================================== */
 .hero-section {
   text-align: center;
-  padding: 2.5rem 0 3.5rem 0;
+  padding: 2rem 0 2.5rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -246,96 +291,138 @@ body.nexov-dark {
 .hero-tagline {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   padding: 4px 14px;
   border-radius: 9999px;
-  background: rgba(103, 252, 198, 0.08);
-  border: 1px solid rgba(103, 252, 198, 0.22);
-  color: var(--nexov-mint);
+  background: var(--hospital-primary-light);
+  border: 1px solid var(--hospital-primary-border);
+  color: var(--hospital-primary-dark);
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
 }
 
-.tag-sparkle {
-  color: var(--nexov-mint);
+.tag-cross {
+  color: var(--hospital-primary);
+  font-weight: 900;
 }
 
 .hero-title {
   font-family: var(--font-space);
-  font-size: 2.4rem;
+  font-size: 2.35rem;
   font-weight: 700;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
-  color: white;
-}
-
-@media (min-width: 768px) {
-  .hero-title {
-    font-size: 3.2rem;
-  }
+  line-height: 1.2;
+  color: var(--hospital-text-main);
+  margin-bottom: 14px;
+  letter-spacing: -0.025em;
 }
 
 .hero-gradient-text {
-  background: linear-gradient(135deg, #ffffff 30%, var(--nexov-mint) 100%);
+  background: linear-gradient(135deg, var(--hospital-primary) 0%, var(--hospital-teal) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero-description {
-  margin-top: 18px;
-  font-size: 1rem;
-  color: var(--nexov-text-muted);
-  max-width: 640px;
+  max-width: 620px;
+  font-size: 0.95rem;
+  color: var(--hospital-text-body);
   line-height: 1.6;
+  margin-bottom: 24px;
 }
 
-.hero-badges {
+.hospital-highlights-bar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 860px;
+  margin-top: 6px;
+}
+
+@media (min-width: 768px) {
+  .hospital-highlights-bar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.highlight-item {
+  background: var(--hospital-card-bg);
+  border: 1px solid var(--hospital-card-border);
+  border-radius: 12px;
+  padding: 12px 14px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+.highlight-item:hover {
+  background: #ffffff;
+  border-color: var(--hospital-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.12);
+}
+
+.hl-icon {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-top: 26px;
 }
 
-.spec-badge {
-  font-size: 0.75rem;
-  padding: 6px 14px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+.hl-meta {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
 
-/* Dashboard Cards */
+.hl-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--hospital-text-main);
+}
+
+.hl-sub {
+  font-size: 0.7rem;
+  color: var(--hospital-primary);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   4. Dashboard Cards (Physicians Roster & Appointments Ledger)
+   ========================================================================== */
 .dashboard-grid {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
 }
 
 .console-card {
-  background: var(--nexov-card-bg);
-  border: 1px solid var(--nexov-card-border);
-  backdrop-filter: blur(16px);
-  border-radius: 20px;
+  background: var(--hospital-card-bg);
+  border: 1px solid var(--hospital-card-border);
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.2s ease;
+  box-shadow: var(--hospital-card-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .console-card:hover {
-  border-color: var(--nexov-card-hover);
+  border-color: var(--hospital-card-hover);
+  box-shadow: var(--hospital-card-shadow-hover);
 }
 
 .card-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--hospital-card-border);
+  padding-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .card-title-group {
@@ -345,52 +432,62 @@ body.nexov-dark {
 }
 
 .terminal-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(103, 252, 198, 0.1);
-  color: var(--nexov-mint);
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--hospital-primary-light);
+  color: var(--hospital-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  border: 1px solid rgba(103, 252, 198, 0.2);
+  font-size: 16px;
+  border: 1px solid var(--hospital-primary-border);
 }
 
 .card-heading {
   font-family: var(--font-space);
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: white;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--hospital-text-main);
 }
 
 .card-sub {
-  font-size: 0.75rem;
-  color: var(--nexov-text-dim);
+  font-size: 0.76rem;
+  color: var(--hospital-text-muted);
 }
 
 .neon-badge {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--hospital-primary-light);
+  color: var(--hospital-primary-dark);
+  border: 1px solid var(--hospital-primary-border);
+}
+
+.neon-badge-neutral {
+  font-size: 0.74rem;
   font-weight: 600;
   padding: 4px 12px;
   border-radius: 9999px;
-  background: rgba(103, 252, 198, 0.1);
-  color: var(--nexov-mint);
-  border: 1px solid rgba(103, 252, 198, 0.3);
+  background: var(--hospital-bg-subtle);
+  color: var(--hospital-text-muted);
+  border: 1px solid var(--hospital-card-border);
 }
 
 .card-actions-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .filter-tabs {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--hospital-bg-subtle);
+  border: 1px solid var(--hospital-card-border);
   border-radius: 10px;
   padding: 3px;
   gap: 4px;
@@ -399,9 +496,9 @@ body.nexov-dark {
 .filter-tab {
   background: transparent;
   border: 1px solid transparent;
-  color: var(--nexov-text-muted);
+  color: var(--hospital-text-muted);
   font-family: var(--font-inter);
-  font-size: 0.74rem;
+  font-size: 0.75rem;
   font-weight: 600;
   padding: 5px 12px;
   border-radius: 7px;
@@ -409,151 +506,275 @@ body.nexov-dark {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.18s ease;
 }
 
 .filter-tab:hover {
-  color: var(--nexov-text-bright);
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--hospital-text-main);
 }
 
 .filter-tab.active {
-  background: rgba(103, 252, 198, 0.12);
-  color: var(--nexov-mint);
-  border-color: rgba(103, 252, 198, 0.28);
-  box-shadow: 0 0 14px rgba(103, 252, 198, 0.18);
+  background: #ffffff;
+  color: var(--hospital-primary-dark);
+  border-color: var(--hospital-card-border);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
 .tab-count {
   font-size: 0.68rem;
   padding: 1px 6px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.06);
   color: inherit;
   font-weight: 700;
 }
 
 .filter-tab.active .tab-count {
-  background: rgba(103, 252, 198, 0.25);
-  color: var(--nexov-mint);
+  background: var(--hospital-primary-light);
+  color: var(--hospital-primary-dark);
 }
 
 .tab-count.count-confirmed {
-  background: rgba(16, 185, 129, 0.18);
-  color: #34d399;
+  background: var(--hospital-emerald-light);
+  color: var(--hospital-emerald-dark);
 }
 
 .tab-count.count-cancelled {
-  background: rgba(239, 68, 68, 0.18);
-  color: #f87171;
+  background: var(--hospital-crimson-light);
+  color: var(--hospital-crimson-dark);
 }
 
-.neon-badge-neutral {
-  font-size: 0.72rem;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--nexov-text-muted);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Doctors Grid */
+/* ==========================================================================
+   5. Physician Cards & Dual-Day Schedule Chips Grid
+   ========================================================================== */
 .doctors-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
 }
 
 .doctor-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 16px;
-  padding: 20px;
+  background: var(--hospital-card-bg);
+  border: 1px solid var(--hospital-card-border);
+  border-radius: 14px;
+  padding: 18px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
 .doctor-card:hover {
-  background: rgba(103, 252, 198, 0.03);
-  border-color: rgba(103, 252, 198, 0.3);
+  border-color: var(--hospital-primary);
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 22px rgba(2, 132, 199, 0.1);
 }
 
 .doc-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  align-items: flex-start;
+  border-bottom: 1px solid var(--hospital-card-border);
   padding-bottom: 14px;
+  gap: 12px;
+  min-height: 74px;
 }
 
 .doc-avatar-group {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.doc-meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .doc-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: rgba(103, 252, 198, 0.08);
-  border: 1px solid rgba(103, 252, 198, 0.25);
-  color: var(--nexov-mint);
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: var(--hospital-primary-light);
+  border: 1px solid var(--hospital-primary-border);
+  color: var(--hospital-primary);
   font-family: var(--font-space);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.doc-name-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
 }
 
 .doc-name {
   font-size: 0.98rem;
   font-weight: 700;
-  color: white;
+  color: var(--hospital-text-main);
+  line-height: 1.25;
 }
 
-.doc-spec {
-  font-size: 0.76rem;
-  font-weight: 500;
-  color: var(--nexov-mint);
+.doc-cred-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--hospital-primary-dark);
+  background: var(--hospital-primary-light);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--hospital-primary-border);
+}
+
+.doc-dept {
+  font-size: 0.74rem;
+  color: var(--hospital-primary);
+  font-weight: 600;
   margin-top: 1px;
 }
 
-.badge-open {
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 4px 10px;
+.doc-room-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--hospital-text-muted);
+  margin-top: 2px;
+}
+
+.rating-val {
+  color: var(--hospital-amber);
+  font-weight: 700;
+}
+
+/* Rigid Right-Aligned Status Column for Perfect Vertical Alignment */
+.doc-status-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 90px;
+  gap: 4px;
+}
+
+.badge-open,
+.badge-busy,
+.badge-leave {
+  width: 86px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   border-radius: 9999px;
-  background: rgba(103, 252, 198, 0.1);
-  color: var(--nexov-mint);
-  border: 1px solid rgba(103, 252, 198, 0.28);
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.badge-open {
+  background: var(--hospital-emerald-light);
+  color: var(--hospital-emerald-dark);
+  border: 1px solid var(--hospital-emerald-border);
 }
 
 .badge-busy {
+  background: var(--hospital-bg-subtle);
+  color: var(--hospital-text-muted);
+  border: 1px solid var(--hospital-card-border);
+}
+
+.badge-leave {
   font-size: 0.72rem;
-  font-weight: 600;
-  padding: 4px 10px;
+  font-weight: 700;
+  padding: 3px 10px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--nexov-text-muted);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.card-on-leave {
+  background: #fbfcfe;
+  border-color: #e2e8f0;
+}
+
+.avatar-on-leave {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+.leave-duty-dot {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #d97706;
+}
+
+.doctor-leave-banner {
+  background: #fffbeb;
+  border: 1px dashed #fcd34d;
+  border-radius: 10px;
+  padding: 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.leave-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.leave-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.leave-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.leave-sub {
+  font-size: 0.72rem;
+  color: #b45309;
+  line-height: 1.4;
+}
+
+.clinic-duty-dot {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--hospital-emerald);
 }
 
 .doc-schedule-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .day-slot-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .day-header {
@@ -566,31 +787,31 @@ body.nexov-dark {
 
 .day-title {
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--nexov-text-bright);
+  color: var(--hospital-text-main);
 }
 
 .day-subdate {
-  color: var(--nexov-text-dim);
+  color: var(--hospital-text-muted);
   font-size: 0.7rem;
 }
 
 .time-chips-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 7px;
+  gap: 6px;
 }
 
 .time-chip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 11px;
+  padding: 6px 10px;
   border-radius: 8px;
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  transition: all 0.18s ease;
+  transition: all 0.16s ease;
 }
 
 .time-chip-val {
@@ -607,127 +828,254 @@ body.nexov-dark {
   border-radius: 4px;
 }
 
-/* 1. Available: clean glowing mint */
+/* 1. Open Available Slot */
 .time-chip.available {
-  background: rgba(103, 252, 198, 0.05);
-  border: 1px solid rgba(103, 252, 198, 0.25);
-  color: #d1fae5;
+  background: var(--hospital-emerald-light);
+  border: 1px solid var(--hospital-emerald-border);
+  color: var(--hospital-emerald-dark);
 }
 
 .time-chip.available:hover {
-  background: rgba(103, 252, 198, 0.12);
-  border-color: rgba(103, 252, 198, 0.5);
+  background: #dcfce7;
+  border-color: #86efac;
 }
 
 .time-chip.available .chip-status-tag {
-  background: rgba(103, 252, 198, 0.16);
-  color: var(--nexov-mint);
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--hospital-emerald-dark);
 }
 
-/* 2. Booked: clean dark subtle chip, NO strikethrough */
+/* 2. Booked Slot (NO strikethrough, clean tag) */
 .time-chip.booked {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: #64748b;
+  background: var(--hospital-crimson-light);
+  border: 1px solid var(--hospital-crimson-border);
+  color: var(--hospital-crimson-dark);
 }
 
 .time-chip.booked .chip-status-tag {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--hospital-crimson);
 }
 
-/* 3. Passed / Elapsed: clean subtle dimmed chip, NO strikethrough */
+/* 3. Passed / Elapsed Slot */
 .time-chip.past {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: #475569;
-  opacity: 0.65;
+  background: var(--hospital-bg-subtle);
+  border: 1px solid var(--hospital-card-border);
+  color: var(--hospital-text-dim);
 }
 
 .time-chip.past .chip-status-tag {
-  background: rgba(255, 255, 255, 0.06);
-  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--hospital-text-muted);
 }
 
 .empty-slots-msg {
   font-size: 0.72rem;
-  color: var(--nexov-text-dim);
-  padding: 8px 0;
+  color: var(--hospital-text-muted);
+  padding: 6px 0;
   text-align: center;
 }
 
-/* Table */
+/* ==========================================================================
+   6. Outpatient Appointment Ledger Table
+   ========================================================================== */
 .table-wrapper {
   overflow-x: auto;
+  border: 1px solid var(--hospital-card-border);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 .nexov-table {
   width: 100%;
+  min-width: 1040px;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   text-align: left;
+  background: #ffffff;
+  table-layout: auto; /* Auto layout prevents ANY overlapping or content overflow */
 }
 
 .nexov-table th {
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--nexov-text-dim);
-  font-size: 0.68rem;
+  padding: 14px 18px;
+  background: var(--hospital-bg-subtle);
+  border-bottom: 2px solid var(--hospital-card-border);
+  color: var(--hospital-text-muted);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .nexov-table td {
-  padding: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Explicit Minimum Column Widths to Ensure Ample Space & Prevent Crowding */
+.th-phone, .col-phone {
+  min-width: 160px;
+  width: 160px;
+}
+
+.th-specialist, .col-specialist {
+  min-width: 230px;
+  white-space: normal;
+}
+
+.th-dept, .col-dept {
+  min-width: 170px;
+  width: 170px;
+}
+
+.th-time, .col-time {
+  min-width: 200px;
+  width: 200px;
+}
+
+.th-type, .col-type {
+  min-width: 150px;
+  width: 150px;
+}
+
+.th-status, .col-status {
+  min-width: 130px;
+  width: 130px;
 }
 
 .nexov-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: #f8fafc;
 }
 
 .phone-badge {
   font-family: monospace;
-  color: var(--nexov-mint);
+  color: var(--hospital-primary-dark);
   font-weight: 600;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  background: var(--hospital-primary-light);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--hospital-primary-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doc-table-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doc-table-name {
+  font-weight: 700;
+  color: var(--hospital-text-main);
+  font-size: 0.88rem;
+  line-height: 1.25;
+}
+
+.doc-table-sub {
+  font-size: 0.72rem;
+  color: var(--hospital-text-muted);
+  font-weight: 500;
+}
+
+.dept-pill {
+  font-size: 0.74rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--hospital-bg-subtle);
+  color: var(--hospital-text-body);
+  border: 1px solid var(--hospital-card-border);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.time-stamp-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.date-str {
+  color: var(--hospital-text-body);
+  font-weight: 600;
+}
+
+.time-str {
+  color: var(--hospital-primary-dark);
+  background: var(--hospital-primary-light);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.type-badge-opd {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--hospital-bg-subtle);
+  color: var(--hospital-text-body);
+  border: 1px solid var(--hospital-card-border);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .status-tag {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 9999px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .status-tag.confirmed {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: var(--hospital-emerald-light);
+  color: var(--hospital-emerald-dark);
+  border: 1px solid var(--hospital-emerald-border);
 }
 
 .status-tag.cancelled {
-  background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.35);
+  background: var(--hospital-crimson-light);
+  color: var(--hospital-crimson-dark);
+  border: 1px solid var(--hospital-crimson-border);
 }
 
 .loading-state {
   text-align: center;
-  color: var(--nexov-text-dim);
+  color: var(--hospital-text-muted);
   padding: 28px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
-/* Phone Terminal Modal */
+/* ==========================================================================
+   7. Redesigned Telehealth Clinical Phone Call UI & Tactile Controls
+   ========================================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -739,33 +1087,61 @@ body.nexov-dark {
   display: none;
 }
 
+/* Sleek Medical Smartphone Frame */
 .nexov-terminal-phone {
   width: 100%;
-  max-width: 380px;
-  height: 680px;
-  background: #090e0c;
-  border-radius: 42px;
-  border: 3px solid rgba(103, 252, 198, 0.3);
-  box-shadow: 0 0 60px rgba(103, 252, 198, 0.15), 0 25px 50px rgba(0, 0, 0, 0.8);
+  max-width: 390px;
+  height: 690px;
+  background: #ffffff;
+  border-radius: 46px;
+  border: 8px solid #0f172a;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 2px #cbd5e1;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
 }
 
-.phone-top-island {
+/* Top Modal Close Button */
+.modal-close-btn {
   position: absolute;
   top: 14px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Smartphone Top Speaker & Camera Island */
+.phone-top-island {
+  position: absolute;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
   width: 110px;
-  height: 20px;
-  background: #000;
+  height: 22px;
+  background: #0f172a;
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   z-index: 20;
 }
 
@@ -776,103 +1152,133 @@ body.nexov-dark {
   background: #1e293b;
 }
 
-.island-indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--nexov-mint);
-  box-shadow: 0 0 8px var(--nexov-mint);
-  animation: nexov-blink 1.5s infinite;
+.island-speaker {
+  width: 36px;
+  height: 4px;
+  border-radius: 4px;
+  background: #334155;
 }
 
+/* Clinical Telehealth Header */
 .agent-profile {
-  padding-top: 48px;
-  padding-bottom: 14px;
+  padding-top: 42px;
+  padding-bottom: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--hospital-card-border);
 }
 
-.neon-orb {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(103, 252, 198, 0.25) 0%, rgba(0, 96, 100, 0.2) 100%);
-  border: 1.5px solid var(--nexov-mint);
-  box-shadow: 0 0 20px rgba(103, 252, 198, 0.3);
-  display: flex;
+.hospital-call-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  background: var(--hospital-primary-light);
+  color: var(--hospital-primary-dark);
+  border: 1px solid var(--hospital-primary-border);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
 
-.orb-core {
-  width: 22px;
-  height: 22px;
+.call-badge-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--nexov-mint);
-  box-shadow: 0 0 16px var(--nexov-mint);
-  animation: nexov-orb-pulse 2s infinite ease-in-out;
+  background: var(--hospital-primary);
 }
 
-@keyframes nexov-orb-pulse {
-  0%, 100% { transform: scale(0.9); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
+.medical-caller-avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--hospital-primary) 0%, #0ea5e9 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.avatar-ring-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(2, 132, 199, 0.35);
+  animation: hospital-ring-pulse 2s infinite ease-out;
+}
+
+@keyframes hospital-ring-pulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 0; }
 }
 
 .agent-title {
   font-family: var(--font-space);
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: white;
+  color: var(--hospital-text-main);
 }
 
 .agent-sub {
-  font-size: 0.72rem;
-  color: var(--nexov-mint);
+  font-size: 0.74rem;
+  color: var(--hospital-text-muted);
+  font-weight: 500;
 }
 
 .call-status-row {
-  margin-top: 6px;
+  margin-top: 5px;
 }
 
 .status-live {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--hospital-amber);
+  background: var(--hospital-amber-light);
+  padding: 2px 10px;
+  border-radius: 9999px;
 }
 
 .status-live.connected {
-  color: var(--nexov-mint);
+  background: var(--hospital-emerald-light);
+  color: var(--hospital-emerald-dark);
+  border: 1px solid var(--hospital-emerald-border);
 }
 
+/* Waveform Visualizer (Clinical Sapphire) */
 .waveform-box {
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 28px;
-  margin-top: 10px;
+  height: 24px;
+  margin-top: 8px;
 }
 
 .bar {
   width: 3.5px;
   height: 4px;
-  background: var(--nexov-mint);
-  box-shadow: 0 0 8px rgba(103, 252, 198, 0.6);
+  background: var(--hospital-primary);
   border-radius: 4px;
   transition: height 0.08s ease;
 }
 
 /* Toast */
 .terminal-toast {
-  margin: 10px 14px 0 14px;
+  margin: 8px 14px 0 14px;
   padding: 8px 14px;
   border-radius: 10px;
-  background: rgba(103, 252, 198, 0.12);
-  border: 1px solid rgba(103, 252, 198, 0.35);
+  background: var(--hospital-emerald-light);
+  border: 1px solid var(--hospital-emerald-border);
   font-size: 0.75rem;
-  color: var(--nexov-mint);
+  color: var(--hospital-emerald-dark);
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -886,19 +1292,19 @@ body.nexov-dark {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--nexov-mint);
-  box-shadow: 0 0 6px var(--nexov-mint);
+  background: var(--hospital-emerald);
 }
 
-/* Transcripts */
+/* Consultation Live Transcript Container */
 .terminal-transcript {
   flex: 1;
   overflow-y: auto;
-  padding: 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
+  background: #f8fafc;
 }
 
 .transcript-placeholder {
@@ -907,18 +1313,41 @@ body.nexov-dark {
 }
 
 .dim-text {
-  color: var(--nexov-text-dim);
+  color: var(--hospital-text-muted);
+  font-size: 0.75rem;
 }
 
-.hint-text {
-  margin-top: 6px;
+.prompt-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.p-chip {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 12px;
   font-size: 0.72rem;
-  color: var(--nexov-mint);
-  opacity: 0.8;
+  color: var(--hospital-primary-dark);
+  text-align: left;
+  line-height: 1.4;
+  border-left: 3px solid var(--hospital-primary);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.p-chip:hover {
+  background: var(--hospital-primary-light);
+  border-color: var(--hospital-primary);
+  transform: translateY(-1px);
 }
 
 .chat-bubble {
-  max-width: 85%;
+  max-width: 86%;
   padding: 9px 13px;
   border-radius: 14px;
   line-height: 1.45;
@@ -926,83 +1355,118 @@ body.nexov-dark {
 
 .chat-bubble.user {
   align-self: flex-end;
-  background: #004d40;
-  color: #e6fffa;
-  border: 1px solid rgba(103, 252, 198, 0.3);
+  background: var(--hospital-primary);
+  color: #ffffff;
   border-bottom-right-radius: 2px;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
 }
 
 .chat-bubble.assistant {
   align-self: flex-start;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f1f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  color: var(--hospital-text-main);
+  border: 1px solid var(--hospital-card-border);
   border-bottom-left-radius: 2px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 .bubble-meta {
   font-size: 0.65rem;
-  color: var(--nexov-text-dim);
-  margin-top: 3px;
+  color: var(--hospital-text-muted);
+  margin-top: 2px;
 }
 
 .user-meta {
   text-align: right;
 }
 
-/* Terminal Controls */
-.terminal-deck {
-  padding: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+/* ==========================================================================
+   8. Authentic Smartphone Call Action Controls (Mute & End Call)
+   ========================================================================== */
+.phone-control-deck {
+  padding: 18px 24px 28px 24px;
+  border-top: 1px solid var(--hospital-card-border);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  background: #050807;
+  gap: 60px;
+  background: #ffffff;
 }
 
-.deck-btn {
-  width: 54px;
-  height: 54px;
+.deck-btn-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.deck-action-btn {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  color: #1e293b;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
-.deck-btn-mute {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: white;
-  font-size: 20px;
+.deck-action-btn svg {
+  display: block;
 }
 
-.deck-btn-mute.active {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #fbbf24;
+.deck-action-btn:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
 }
 
-.deck-btn-hangup {
-  background: var(--nexov-danger);
-  color: white;
-  font-size: 20px;
-  box-shadow: 0 0 20px var(--nexov-danger-glow);
+#muteBtn.active {
+  background: var(--hospital-crimson-light);
+  border-color: var(--hospital-crimson-border);
+  color: var(--hospital-crimson);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2);
 }
 
-.deck-btn-hangup:hover {
-  background: #e11d48;
-  transform: scale(1.08);
+.deck-hangup-btn {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
-/* Footer */
+.deck-hangup-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.55);
+  transform: scale(1.06);
+}
+
+.deck-btn-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--hospital-text-body);
+  letter-spacing: 0.01em;
+}
+
+.text-danger {
+  color: var(--hospital-crimson) !important;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   9. Footer
+   ========================================================================== */
 .nexov-footer {
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(7, 10, 9, 0.9);
-  padding: 22px 1.25rem;
+  border-top: 1px solid var(--hospital-card-border);
+  background: #ffffff;
+  padding: 20px 1.25rem;
 }
 
 .footer-container {
@@ -1021,18 +1485,32 @@ body.nexov-dark {
   }
 }
 
+.ft-logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--hospital-primary-light);
+  border: 1px solid var(--hospital-primary-border);
+  color: var(--hospital-primary);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
 .ft-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .ft-sub {
-  font-size: 0.75rem;
-  color: var(--nexov-text-dim);
+  font-size: 0.74rem;
+  color: var(--hospital-text-muted);
 }
 
 .ft-copy {
   font-size: 0.72rem;
-  color: var(--nexov-text-dim);
+  color: var(--hospital-text-dim);
 }

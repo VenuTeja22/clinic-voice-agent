@@ -16,6 +16,52 @@ let inputAnalyser = null;
 let outputAnalyser = null;
 let animFrameId = null;
 
+// Clinical Metadata for Hospital Specialists
+const DOCTOR_DETAILS = {
+  'Dr. Sarah Jenkins': {
+    credentials: 'MD, FACC',
+    dept: 'Heart & Vascular Center',
+    deptIcon: '🫀',
+    experience: '15 Yrs Exp',
+    rating: '4.9 ★'
+  },
+  'Dr. Rajesh Sharma': {
+    credentials: 'MBBS, MD',
+    dept: 'Internal Medicine Care',
+    deptIcon: '🩺',
+    experience: '18 Yrs Exp',
+    rating: '4.9 ★'
+  },
+  'Dr. Emily Watson': {
+    credentials: 'MD, FAAD',
+    dept: 'Advanced Skin & Laser Clinic',
+    deptIcon: '🔬',
+    experience: '12 Yrs Exp',
+    rating: '4.8 ★'
+  },
+  'Dr. Michael Chang': {
+    credentials: 'MD, FAAP',
+    dept: 'Child Health Pavilion',
+    deptIcon: '🧸',
+    experience: '14 Yrs Exp',
+    rating: '4.9 ★'
+  },
+  'Dr. Ananya Iyer': {
+    credentials: 'MS, DNB (Ortho)',
+    dept: 'Bone & Joint Institute',
+    deptIcon: '🦴',
+    experience: '16 Yrs Exp',
+    rating: '4.9 ★'
+  },
+  'Dr. David Miller': {
+    credentials: 'MD, DM (Neuro)',
+    dept: 'Brain & Spine Institute',
+    deptIcon: '🧠',
+    experience: '13 Yrs Exp',
+    rating: '4.8 ★'
+  }
+};
+
 // DOM Elements
 const startCallBtn = document.getElementById('startCallBtn');
 const phoneModal = document.getElementById('phoneModal');
@@ -85,10 +131,20 @@ function renderDoctors(doctors) {
     const availableToday = todaySlots.filter((s) => !s.is_booked && !isSlotPast(s.date, s.time)).length;
     const availableTmrw = tmrwSlots.filter((s) => !s.is_booked && !isSlotPast(s.date, s.time)).length;
     const totalOpen = availableToday + availableTmrw;
+    const isOnLeave = Boolean(doc.on_leave);
 
     // Doctor Initials (e.g. Dr. Sarah Jenkins -> SJ)
     const nameParts = doc.name.replace(/^Dr\.\s*/i, '').trim().split(' ');
     const initials = nameParts.map((p) => p[0]).join('').slice(0, 2).toUpperCase() || 'DR';
+
+    // Doctor Clinical Metadata
+    const docMeta = DOCTOR_DETAILS[doc.name] || {
+      credentials: 'MD Specialist',
+      dept: doc.specialty,
+      deptIcon: '🩺',
+      experience: '10+ Yrs Exp',
+      rating: '4.8 ★'
+    };
 
     function buildChips(slotsList) {
       if (!slotsList.length) {
@@ -117,43 +173,67 @@ function renderDoctors(doctors) {
     }
 
     const card = document.createElement('div');
-    card.className = 'doctor-card';
+    card.className = `doctor-card ${isOnLeave ? 'card-on-leave' : ''}`;
     card.innerHTML = `
       <div class="doc-card-header">
         <div class="doc-avatar-group">
-          <div class="doc-avatar">${initials}</div>
-          <div>
-            <div class="doc-name">${doc.name}</div>
-            <div class="doc-spec">${doc.specialty}</div>
+          <div class="doc-avatar ${isOnLeave ? 'avatar-on-leave' : ''}">${initials}</div>
+          <div class="doc-meta-block">
+            <div class="doc-name-row">
+              <span class="doc-name">${doc.name}</span>
+              <span class="doc-cred-tag">${docMeta.credentials}</span>
+            </div>
+            <div class="doc-dept">${docMeta.deptIcon} ${doc.specialty} • ${docMeta.dept}</div>
+            <div class="doc-room-row">
+              <span>${docMeta.experience}</span>
+              <span>•</span>
+              <span class="rating-val">${docMeta.rating}</span>
+            </div>
           </div>
         </div>
-        <span class="${totalOpen > 0 ? 'badge-open' : 'badge-busy'}">
-          ${totalOpen} Open
-        </span>
+        <div class="doc-status-col">
+          ${isOnLeave
+            ? `<span class="badge-leave">On Leave</span>
+               <span class="leave-duty-dot">○ On Leave</span>`
+            : `<span class="${totalOpen > 0 ? 'badge-open' : 'badge-busy'}">
+                 ${totalOpen} Open
+               </span>
+               <span class="clinic-duty-dot">● In Clinic</span>`
+          }
+        </div>
       </div>
 
       <div class="doc-schedule-section">
-        <!-- Today Group -->
-        <div class="day-slot-group">
-          <div class="day-header">
-            <span class="day-title">Today</span>
-            <span class="day-subdate">${todayDisplayDate}</span>
-          </div>
-          <div class="time-chips-grid">
-            ${buildChips(todaySlots)}
-          </div>
-        </div>
+        ${isOnLeave
+          ? `<div class="doctor-leave-banner">
+               <span class="leave-icon">🌴</span>
+               <div class="leave-text">
+                 <span class="leave-title">Physician on Scheduled Leave</span>
+                 <span class="leave-sub">No outpatient consultation slots for Today & Tomorrow.</span>
+               </div>
+             </div>`
+          : `<!-- Today Group -->
+             <div class="day-slot-group">
+               <div class="day-header">
+                 <span class="day-title">Today</span>
+                 <span class="day-subdate">${todayDisplayDate}</span>
+               </div>
+               <div class="time-chips-grid">
+                 ${buildChips(todaySlots)}
+               </div>
+             </div>
 
-        <!-- Tomorrow Group -->
-        <div class="day-slot-group">
-          <div class="day-header">
-            <span class="day-title">Tomorrow</span>
-            <span class="day-subdate">${tmrwDisplayDate}</span>
-          </div>
-          <div class="time-chips-grid">
-            ${buildChips(tmrwSlots)}
-          </div>
-        </div>
+             <!-- Tomorrow Group -->
+             <div class="day-slot-group">
+               <div class="day-header">
+                 <span class="day-title">Tomorrow</span>
+                 <span class="day-subdate">${tmrwDisplayDate}</span>
+               </div>
+               <div class="time-chips-grid">
+                 ${buildChips(tmrwSlots)}
+               </div>
+             </div>`
+        }
       </div>
     `;
     doctorsGrid.appendChild(card);
@@ -193,26 +273,46 @@ function renderAppointments() {
 
   if (filtered.length === 0) {
     const label = currentFilter === 'ALL' ? 'recorded' : currentFilter.toLowerCase();
-    appointmentsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:28px;">No ${label} appointments found.</td></tr>`;
+    appointmentsTableBody.innerHTML = `<tr><td colspan="6" class="loading-state">No ${label} appointments found.</td></tr>`;
     return;
   }
 
   appointmentsTableBody.innerHTML = filtered
-    .map(
-      (apt) => `
+    .map((apt) => {
+      const docMeta = DOCTOR_DETAILS[apt.doctor_name] || {
+        credentials: 'MD',
+        dept: apt.specialty,
+        deptIcon: '🩺'
+      };
+
+      return `
       <tr>
-        <td class="phone-badge">📞 ${apt.patient_phone}</td>
-        <td style="font-weight:600;">${apt.doctor_name}</td>
-        <td style="color:#64748b;">${apt.specialty}</td>
-        <td>${apt.date} • ${apt.time}</td>
-        <td>
+        <td class="col-phone">
+          <span class="phone-badge">📞 ${apt.patient_phone}</span>
+        </td>
+        <td class="col-specialist">
+          <div class="doc-table-meta">
+            <span class="doc-table-name">${apt.doctor_name}</span>
+            <span class="doc-table-sub">${docMeta.credentials}</span>
+          </div>
+        </td>
+        <td class="col-dept">
+          <span class="dept-pill">${docMeta.deptIcon} ${apt.specialty}</span>
+        </td>
+        <td class="col-time">
+          <span class="time-stamp-val">
+            <span class="date-str">📅 ${apt.date}</span>
+            <span class="time-str">⏰ ${apt.time}</span>
+          </span>
+        </td>
+        <td class="col-status">
           <span class="status-tag ${apt.status === 'CONFIRMED' ? 'confirmed' : 'cancelled'}">
             ${apt.status === 'CONFIRMED' ? '✓ Confirmed' : '✕ Cancelled'}
           </span>
         </td>
       </tr>
-    `
-    )
+    `;
+    })
     .join('');
 }
 
@@ -390,196 +490,233 @@ function stopWaveformVisualizer() {
   });
 }
 
-  // Voice Call WebSocket Connection (Mic Input & Speaker Output)
-  async function startCall() {
-    try {
-      startCallBtn.disabled = true;
-      startCallBtn.innerHTML = `<span class="call-icon">📞</span><span>Connecting...</span>`;
-      transcriptBox.innerHTML = `<div class="transcript-placeholder">Connecting audio directly over WebSocket...</div>`;
-      phoneModal.classList.remove('hidden');
-      callStatusText.textContent = 'Connecting audio...';
-      callStatusText.className = 'call-status';
+// Voice Call WebSocket Connection (Mic Input & Speaker Output)
+async function startCall() {
+  try {
+    startCallBtn.disabled = true;
+    startCallBtn.innerHTML = `<span class="call-icon">📞</span><span>Connecting...</span>`;
+    transcriptBox.innerHTML = `<div class="transcript-placeholder">Connecting audio directly over WebSocket...</div>`;
+    phoneModal.classList.remove('hidden');
+    callStatusText.textContent = 'Connecting audio...';
+    callStatusText.className = 'call-status';
 
-      // 1. Initialize & resume audio output context
-      if (!audioOutputContext) {
-        audioOutputContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+    // 1. Initialize & resume audio output context
+    if (!audioOutputContext) {
+      audioOutputContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+    }
+    await audioOutputContext.resume();
+
+    // 2. Request Microphone Access
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: 1,
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
       }
-      await audioOutputContext.resume();
+    });
 
-      // 2. Request Microphone Access
-      micStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
+    // 3. Open Call WebSocket
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    callSocket = new WebSocket(`${protocol}//${window.location.host}/ws/call`);
+    callSocket.binaryType = 'arraybuffer';
+
+    callSocket.onopen = async () => {
+      callStatusText.textContent = 'Connected (00:00)';
+      callStatusText.className = 'call-status connected';
+
+      callDuration = 0;
+      nextPlayTime = 0;
+      callTimer = setInterval(() => {
+        callDuration++;
+        const mins = String(Math.floor(callDuration / 60)).padStart(2, '0');
+        const secs = String(callDuration % 60).padStart(2, '0');
+        callStatusText.textContent = `Connected (${mins}:${secs})`;
+      }, 1000);
+
+      // 4. Setup Input AudioContext & Processing
+      audioInputContext = new (window.AudioContext || window.webkitAudioContext)();
+      await audioInputContext.resume();
+
+      inputAnalyser = audioInputContext.createAnalyser();
+      inputAnalyser.fftSize = 64;
+      inputAnalyser.smoothingTimeConstant = 0.5;
+
+      audioInputSource = audioInputContext.createMediaStreamSource(micStream);
+      audioInputSource.connect(inputAnalyser);
+
+      // Buffer size 4096 gives ~85ms at 48kHz
+      audioProcessor = audioInputContext.createScriptProcessor(4096, 1, 1);
+
+      const actualSampleRate = audioInputContext.sampleRate;
+      console.log(`Mic initialized at hardware rate: ${actualSampleRate}Hz. Downsampling to 16000Hz.`);
+
+      audioProcessor.onaudioprocess = (e) => {
+        if (isMuted || !callSocket || callSocket.readyState !== WebSocket.OPEN) return;
+        const inputData = e.inputBuffer.getChannelData(0);
+
+        // Downsample to standard 16kHz
+        const downsampled = downsampleBuffer(inputData, actualSampleRate, 16000);
+
+        // Convert Float32 to 16-bit PCM Int16
+        const pcm16 = new Int16Array(downsampled.length);
+        for (let i = 0; i < downsampled.length; i++) {
+          const s = Math.max(-1, Math.min(1, downsampled[i]));
+          pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
         }
-      });
 
-      // 3. Open Call WebSocket
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      callSocket = new WebSocket(`${protocol}//${window.location.host}/ws/call`);
-      callSocket.binaryType = 'arraybuffer';
-
-      callSocket.onopen = async () => {
-        callStatusText.textContent = 'Connected (00:00)';
-        callStatusText.className = 'call-status connected';
-
-        callDuration = 0;
-        nextPlayTime = 0;
-        callTimer = setInterval(() => {
-          callDuration++;
-          const mins = String(Math.floor(callDuration / 60)).padStart(2, '0');
-          const secs = String(callDuration % 60).padStart(2, '0');
-          callStatusText.textContent = `Connected (${mins}:${secs})`;
-        }, 1000);
-
-        // 4. Setup Input AudioContext & Processing
-        audioInputContext = new (window.AudioContext || window.webkitAudioContext)();
-        await audioInputContext.resume();
-
-        inputAnalyser = audioInputContext.createAnalyser();
-        inputAnalyser.fftSize = 64;
-        inputAnalyser.smoothingTimeConstant = 0.5;
-
-        audioInputSource = audioInputContext.createMediaStreamSource(micStream);
-        audioInputSource.connect(inputAnalyser);
-
-        // Buffer size 4096 gives ~85ms at 48kHz
-        audioProcessor = audioInputContext.createScriptProcessor(4096, 1, 1);
-
-        const actualSampleRate = audioInputContext.sampleRate;
-        console.log(`Mic initialized at hardware rate: ${actualSampleRate}Hz. Downsampling to 16000Hz.`);
-
-        audioProcessor.onaudioprocess = (e) => {
-          if (isMuted || !callSocket || callSocket.readyState !== WebSocket.OPEN) return;
-          const inputData = e.inputBuffer.getChannelData(0);
-
-          // Downsample to standard 16kHz
-          const downsampled = downsampleBuffer(inputData, actualSampleRate, 16000);
-
-          // Convert Float32 to 16-bit PCM Int16
-          const pcm16 = new Int16Array(downsampled.length);
-          for (let i = 0; i < downsampled.length; i++) {
-            const s = Math.max(-1, Math.min(1, downsampled[i]));
-            pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-          }
-
-          callSocket.send(pcm16.buffer);
-        };
-
-        audioInputSource.connect(audioProcessor);
-        audioProcessor.connect(audioInputContext.destination);
-
-        // Start dynamic audio-reactive waveform
-        startWaveformVisualizer();
+        callSocket.send(pcm16.buffer);
       };
 
-          callSocket.onmessage = async (event) => {
-            let data = event.data;
-            if (data instanceof Blob) {
-              data = await data.arrayBuffer();
-            }
-            if (data instanceof ArrayBuffer && data.byteLength > 0) {
-              playPCMChunk(data);
-            }
-          };
+      audioInputSource.connect(audioProcessor);
+      audioProcessor.connect(audioInputContext.destination);
 
-          callSocket.onerror = (e) => {
-            console.error('WebSocket call error:', e);
-          };
+      // Start dynamic audio-reactive waveform
+      startWaveformVisualizer();
+    };
 
-          callSocket.onclose = () => {
-            endCall();
-          };
+    callSocket.onmessage = async (event) => {
+      let data = event.data;
+      if (data instanceof Blob) {
+        data = await data.arrayBuffer();
+      }
+      if (data instanceof ArrayBuffer && data.byteLength > 0) {
+        playPCMChunk(data);
+      }
+    };
 
-        } catch (err) {
-          console.error('Start call error:', err);
-          alert('Microphone access denied or error starting call.');
-          endCall();
-        } finally {
-          startCallBtn.disabled = false;
-          startCallBtn.innerHTML = `
+    callSocket.onerror = (e) => {
+      console.error('WebSocket call error:', e);
+    };
+
+    callSocket.onclose = () => {
+      endCall();
+    };
+
+  } catch (err) {
+    console.error('Start call error:', err);
+    alert('Microphone access denied or error starting call.');
+    endCall();
+  } finally {
+    startCallBtn.disabled = false;
+    startCallBtn.innerHTML = `
             <span class="call-icon">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/>
               </svg>
             </span>
             <span>Start Voice Agent</span>`;
-        }
-      }
+  }
+}
 
-      function endCall() {
-        clearInterval(callTimer);
-        callStatusText.textContent = 'Call Ended';
-        callStatusText.className = 'call-status';
+function endCall() {
+  clearInterval(callTimer);
+  callStatusText.textContent = 'Call Ended';
+  callStatusText.className = 'call-status';
 
-        // Stop Waveform Visualizer
-        stopWaveformVisualizer();
+  // Stop Waveform Visualizer
+  stopWaveformVisualizer();
 
-        // Stop Audio Nodes
-        if (inputAnalyser) {
-          try { inputAnalyser.disconnect(); } catch (e) { }
-          inputAnalyser = null;
-        }
-        if (audioProcessor) {
-          try { audioProcessor.disconnect(); } catch (e) { }
-          audioProcessor = null;
-        }
-        if (audioInputSource) {
-          try { audioInputSource.disconnect(); } catch (e) { }
-          audioInputSource = null;
-        }
-        if (audioInputContext) {
-          try { audioInputContext.close(); } catch (e) { }
-          audioInputContext = null;
-        }
-        if (micStream) {
-          micStream.getTracks().forEach((track) => track.stop());
-          micStream = null;
-        }
+  // Stop Audio Nodes
+  if (inputAnalyser) {
+    try { inputAnalyser.disconnect(); } catch (e) { }
+    inputAnalyser = null;
+  }
+  if (audioProcessor) {
+    try { audioProcessor.disconnect(); } catch (e) { }
+    audioProcessor = null;
+  }
+  if (audioInputSource) {
+    try { audioInputSource.disconnect(); } catch (e) { }
+    audioInputSource = null;
+  }
+  if (audioInputContext) {
+    try { audioInputContext.close(); } catch (e) { }
+    audioInputContext = null;
+  }
+  if (micStream) {
+    micStream.getTracks().forEach((track) => track.stop());
+    micStream = null;
+  }
 
-        // Close Call Socket
-        if (callSocket) {
-          if (callSocket.readyState === WebSocket.OPEN) {
-            callSocket.close();
-          }
-          callSocket = null;
-        }
+  // Close Call Socket
+  if (callSocket) {
+    if (callSocket.readyState === WebSocket.OPEN) {
+      callSocket.close();
+    }
+    callSocket = null;
+  }
 
-        setTimeout(() => {
-          phoneModal.classList.add('hidden');
-        }, 1000);
-      }
+  setTimeout(() => {
+    phoneModal.classList.add('hidden');
+  }, 1000);
+}
 
-      function toggleMute() {
-        isMuted = !isMuted;
-        if (isMuted) {
-          muteBtn.classList.add('active');
-          muteBtn.textContent = '🔇';
-        } else {
-          muteBtn.classList.remove('active');
-          muteBtn.textContent = '🎤';
-        }
-      }
+function toggleMute() {
+  isMuted = !isMuted;
+  const muteLabel = document.getElementById('muteBtnLabel');
+  if (isMuted) {
+    muteBtn.classList.add('active');
+    muteBtn.innerHTML = '<span class="btn-icon">🔇</span>';
+    if (muteLabel) muteLabel.textContent = 'Unmute';
+  } else {
+    muteBtn.classList.remove('active');
+    muteBtn.innerHTML = '<span class="btn-icon">🎤</span>';
+    if (muteLabel) muteLabel.textContent = 'Mute';
+  }
+}
 
-      // Event Listeners
-      startCallBtn.addEventListener('click', startCall);
-      endCallBtn.addEventListener('click', endCall);
-      muteBtn.addEventListener('click', toggleMute);
+// Event Listeners
+startCallBtn.addEventListener('click', startCall);
+endCallBtn.addEventListener('click', endCall);
+muteBtn.addEventListener('click', toggleMute);
 
-      // Filter Tabs for Appointments
-      const filterTabs = document.querySelectorAll('.filter-tab');
-      filterTabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          filterTabs.forEach((t) => t.classList.remove('active'));
-          tab.classList.add('active');
-          currentFilter = tab.getAttribute('data-filter') || 'ALL';
-          renderAppointments();
-        });
-      });
+// Modal Close Button
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+if (modalCloseBtn) {
+  modalCloseBtn.addEventListener('click', endCall);
+}
 
-      // Initialize Dashboard
-      fetchDoctors();
-      fetchAppointments();
-      initDashboardWebSocket();
+// Speaker Toggle Button
+const speakerBtn = document.getElementById('speakerBtn');
+if (speakerBtn) {
+  speakerBtn.addEventListener('click', () => {
+    speakerBtn.classList.toggle('active');
+  });
+}
+
+// Quick Prompts Toggle Button
+const promptsToggleBtn = document.getElementById('promptsToggleBtn');
+if (promptsToggleBtn) {
+  promptsToggleBtn.addEventListener('click', () => {
+    const quickPromptChips = document.getElementById('quickPromptChips');
+    if (quickPromptChips) {
+      quickPromptChips.classList.toggle('hidden');
+    }
+  });
+}
+
+// Filter Tabs for Appointments
+const filterTabs = document.querySelectorAll('.filter-tab');
+filterTabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    filterTabs.forEach((t) => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.getAttribute('data-filter') || 'ALL';
+    renderAppointments();
+  });
+});
+
+// Quick Consultation Prompt Chips
+document.querySelectorAll('.p-chip').forEach((chip) => {
+  chip.addEventListener('click', () => {
+    if (!callSocket || callSocket.readyState !== WebSocket.OPEN) {
+      startCall();
+    }
+  });
+});
+
+// Initialize Dashboard
+fetchDoctors();
+fetchAppointments();
+initDashboardWebSocket();

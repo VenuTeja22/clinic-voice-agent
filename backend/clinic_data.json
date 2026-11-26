@@ -19,6 +19,18 @@
       "id": 4,
       "name": "Dr. Michael Chang",
       "specialty": "Pediatrics"
+    },
+    {
+      "id": 5,
+      "name": "Dr. Ananya Iyer",
+      "specialty": "Orthopedics",
+      "on_leave": false
+    },
+    {
+      "id": 6,
+      "name": "Dr. David Miller",
+      "specialty": "Neurology",
+      "on_leave": true
     }
   ],
   "slots": [
@@ -277,6 +289,70 @@
       "date": "2026-11-27",
       "time": "04:30 PM",
       "is_booked": false
+    },
+    {
+      "id": 33,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "is_booked": false
+    },
+    {
+      "id": 34,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-26",
+      "time": "10:30 AM",
+      "is_booked": false
+    },
+    {
+      "id": 35,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-26",
+      "time": "02:00 PM",
+      "is_booked": false
+    },
+    {
+      "id": 36,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "is_booked": false
+    },
+    {
+      "id": 37,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-27",
+      "time": "09:00 AM",
+      "is_booked": false
+    },
+    {
+      "id": 38,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-27",
+      "time": "10:30 AM",
+      "is_booked": false
+    },
+    {
+      "id": 39,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-27",
+      "time": "02:00 PM",
+      "is_booked": false
+    },
+    {
+      "id": 40,
+      "doctor_id": 5,
+      "doctor_name": "Dr. Ananya Iyer",
+      "date": "2026-11-27",
+      "time": "04:30 PM",
+      "is_booked": false
     }
   ],
   "appointments": [
@@ -410,6 +486,28 @@
       "specialty": "General Medicine",
       "date": "2026-11-27",
       "time": "10:30 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 13,
+      "patient_name": "Caller",
+      "patient_phone": "9994440000",
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "specialty": "Pediatrics",
+      "date": "2026-11-27",
+      "time": "04:30 PM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 14,
+      "patient_name": "Caller",
+      "patient_phone": "799527572",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
       "status": "CANCELLED"
     }
   ]

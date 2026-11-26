@@ -4,38 +4,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NexovCare Hospital — Voice Appointment Assistant</title>
+  <title>NexovAI Hospital — Specialist Voice Appointment Desk</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="nexov-dark">
-  <!-- Glowing Background Mesh -->
-  <div class="ambient-glow glow-top-left"></div>
-  <div class="ambient-glow glow-top-right"></div>
-  <div class="grid-overlay"></div>
+<body class="hospital-theme">
+
+  <!-- Top Emergency & Clinical Ribbon -->
+  <div class="hospital-ticker">
+    <div class="ticker-content">
+      <span class="ticker-alert"><span class="alert-pulse"></span> 24/7 EMERGENCY & TRAUMA: 108 / (080) 4123-9000</span>
+      <span class="ticker-sep">•</span>
+      <span>OUTPATIENT DEPT (OPD) ACTIVE</span>
+      <span class="ticker-sep">•</span>
+      <span>NABH ACCREDITED MULTI-SPECIALTY</span>
+      <span class="ticker-sep">•</span>
+      <span class="ticker-badge">LIVE VOICE APPOINTMENT DESK</span>
+    </div>
+  </div>
 
   <!-- Navigation Bar -->
   <header class="navbar">
     <div class="nav-container">
       <div class="nav-brand">
-        <div class="brand-badge-dot"></div>
-        <span class="brand-text">Nexov<span class="text-mint">AI</span> Hospital</span>
+        <div class="medical-cross-logo">
+          <span class="cross-icon">✚</span>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-text">Nexov<span class="text-blue">Care</span> Hospital</span>
+          <span class="brand-sub">Multi-Specialty Care & Surgical Center</span>
+        </div>
+      </div>
+
+      <div class="nav-center-badges">
+        <div class="nav-pill-badge">
+          <span class="pill-dot"></span>
+          <span>OPD Hours: 09:00 AM – 05:00 PM</span>
+        </div>
       </div>
 
       <div class="nav-actions">
-        <button id="startCallBtn" class="btn btn-mint-glow">
+        <button id="startCallBtn" class="btn btn-hospital-call">
           <span class="call-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z" />
             </svg>
           </span>
-          <span>Start Voice Agent</span>
+          <span>Call Voice Desk</span>
         </button>
       </div>
     </div>
@@ -45,18 +66,51 @@
   <main class="main-container">
     <section class="hero-section">
       <div class="hero-tagline">
-        <span class="tag-sparkle">✦</span>
-        <span>24/7 INTELLIGENT APPOINTMENT DESK</span>
+        <span class="tag-cross">✚</span>
+        <span>24/7 AI-POWERED PATIENT CONCIERGE</span>
       </div>
 
       <h1 class="hero-title">
-        NexovCare Hospital<br>
-        <span class="hero-gradient-text">Doctor Appointment Desk.</span>
+        Specialist Healthcare,<br>
+        <span class="hero-gradient-text">Scheduled in Seconds.</span>
       </h1>
 
       <p class="hero-description">
-        Schedule, check availability, or manage doctor appointments seamlessly over real-time conversational voice.
+        Speak directly with <strong>Cura</strong>, our 24/7 AI Hospital Receptionist. Check physician schedules, book
+        outpatient consultations, or manage cancellations with zero hold time.
       </p>
+
+      <!-- Department Highlights Row -->
+      <div class="hospital-highlights-bar">
+        <div class="highlight-item">
+          <span class="hl-icon">🫀</span>
+          <div class="hl-meta">
+            <span class="hl-title">Cardiology</span>
+            <span class="hl-sub">Heart Institute</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <span class="hl-icon">🩺</span>
+          <div class="hl-meta">
+            <span class="hl-title">General Medicine</span>
+            <span class="hl-sub">Internal Care</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <span class="hl-icon">🔬</span>
+          <div class="hl-meta">
+            <span class="hl-title">Dermatology</span>
+            <span class="hl-sub">Skin Center</span>
+          </div>
+        </div>
+        <div class="highlight-item">
+          <span class="hl-icon">🧸</span>
+          <div class="hl-meta">
+            <span class="hl-title">Pediatrics</span>
+            <span class="hl-sub">Child Health</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Operational Dashboard Grid -->
@@ -65,13 +119,12 @@
       <section class="console-card">
         <div class="card-topbar">
           <div class="card-title-group">
-            <span class="terminal-icon">❖</span>
+            <span class="terminal-icon">🩺</span>
             <div>
-              <h2 class="card-heading">Active Physicians & Slot Registry</h2>
-              <p class="card-sub">Dynamic slot allocation via function calling</p>
+              <h2 class="card-heading">Consulting Specialists & Slot Registry</h2>
+              <p class="card-sub">Real-time outpatient consultation slots for Today & Tomorrow</p>
             </div>
           </div>
-          <span id="doctorsCountBadge" class="neon-badge">4 Physicians Active</span>
         </div>
 
         <div id="doctorsGrid" class="doctors-grid">
@@ -85,8 +138,9 @@
           <div class="card-title-group">
             <span class="terminal-icon">📋</span>
             <div>
-              <h2 class="card-heading">Live Appointments Stream</h2>
-              <p class="card-sub">Real-time ledger updating instantaneously upon voice confirmation</p>
+              <h2 class="card-heading">Patient Appointment Ledger</h2>
+              <p class="card-sub">Live outpatient department schedule updating instantaneously upon voice confirmation
+              </p>
             </div>
           </div>
 
@@ -113,16 +167,16 @@
           <table class="nexov-table">
             <thead>
               <tr>
-                <th>Patient Phone</th>
-                <th>Assigned Physician</th>
-                <th>Specialty</th>
-                <th>Slot Timestamp</th>
-                <th>State</th>
+                <th class="th-phone">Patient Phone</th>
+                <th class="th-specialist">Assigned Specialist</th>
+                <th class="th-dept">Department</th>
+                <th class="th-time">Consultation Time</th>
+                <th class="th-status">Status</th>
               </tr>
             </thead>
             <tbody id="appointmentsTableBody">
               <tr>
-                <td colspan="5" class="loading-state">Loading appointment ledger...</td>
+                <td colspan="6" class="loading-state">Loading patient appointment ledger...</td>
               </tr>
             </tbody>
           </table>
@@ -131,37 +185,47 @@
     </div>
   </main>
 
-  <!-- Futuristic Phone Modal (Voice Agent Interface) -->
+  <!-- Telehealth Clinical Voice Phone Modal -->
   <div id="phoneModal" class="modal-backdrop hidden">
     <div class="nexov-terminal-phone">
-      <!-- Terminal Status Bar -->
+      <!-- Modal Close Button -->
+      <button id="modalCloseBtn" class="modal-close-btn" title="Close / End Call">✕</button>
+
+      <!-- Smartphone Top Island -->
       <div class="phone-top-island">
         <div class="island-camera"></div>
-        <div class="island-indicator"></div>
+        <div class="island-speaker"></div>
       </div>
 
-      <!-- Agent Avatar & Identity -->
+      <!-- Agent Profile & Identity -->
       <div class="agent-profile">
-        <div class="neon-orb">
-          <div class="orb-core"></div>
+        <div class="hospital-call-badge">
+          <span class="call-badge-dot"></span>
+          <span>NEXOVCARE TELEHEALTH HELPLINE</span>
         </div>
-        <h3 class="agent-title">NexovAI Voice Assistant</h3>
-        <p class="agent-sub">NexovCare Hospital Desk</p>
+
+        <div class="medical-caller-avatar">
+          <span class="avatar-icon">🩺</span>
+          <div class="avatar-ring-pulse"></div>
+        </div>
+
+        <h3 class="agent-title">Cura</h3>
+        <p class="agent-sub">AI Outpatient Receptionist</p>
 
         <!-- Status & Waveform -->
         <div class="call-status-row">
-          <span id="callStatusText" class="status-live">Connecting WebSocket...</span>
+          <span id="callStatusText" class="status-live">Connecting to Clinical Desk...</span>
         </div>
 
-        <!-- Glowing Neon Waveform -->
+        <!-- Dynamic Audio Waveform -->
         <div class="waveform-box">
-          <span class="bar b1"></span>
-          <span class="bar b2"></span>
-          <span class="bar b3"></span>
-          <span class="bar b4"></span>
-          <span class="bar b5"></span>
-          <span class="bar b6"></span>
-          <span class="bar b7"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
         </div>
       </div>
 
@@ -171,22 +235,43 @@
         <span id="actionToastText">Appointment Confirmed</span>
       </div>
 
-      <!-- Live Telephony Transcript Stream -->
+      <!-- Live Clinical Transcript Stream -->
       <div id="transcriptBox" class="terminal-transcript">
         <div class="transcript-placeholder">
-          <p class="dim-text">Speak to schedule, check, or cancel hospital appointments.</p>
-          <p class="hint-text">"Hi, is Dr. Sarah Jenkins available tomorrow?"</p>
+          <p class="dim-text">Speak naturally with Cura to check doctor availability, schedule visits, or cancel
+            bookings.</p>
+          <div class="prompt-chips" id="quickPromptChips">
+            <span class="p-chip">🩺 "Is Dr. Sarah Jenkins available tomorrow?"</span>
+            <span class="p-chip">📅 "Book 04:30 PM today with Dr. Sharma"</span>
+            <span class="p-chip">✕ "Cancel my appointment"</span>
+          </div>
         </div>
       </div>
 
-      <!-- Control Deck -->
-      <div class="terminal-deck">
-        <button id="muteBtn" class="deck-btn deck-btn-mute" title="Mute Microphone">
-          <span class="btn-symbol">🎤</span>
-        </button>
-        <button id="endCallBtn" class="deck-btn deck-btn-hangup" title="Terminate Session">
-          <span class="btn-symbol">✕</span>
-        </button>
+      <!-- Phone Controls Deck (Real Smartphone Call Controls: Mute and End Call) -->
+      <div class="phone-control-deck">
+        <div class="deck-btn-group">
+          <button id="muteBtn" class="deck-action-btn" title="Mute Microphone">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+          </button>
+          <span class="deck-btn-label" id="muteBtnLabel">Mute</span>
+        </div>
+
+        <div class="deck-btn-group">
+          <button id="endCallBtn" class="deck-action-btn deck-hangup-btn" title="End Consultation">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.996.996 0 0 1 0-1.41C3.41 8.5 7.48 6.7 12 6.7s8.59 1.8 11.71 4.96c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z" />
+            </svg>
+          </button>
+          <span class="deck-btn-label text-danger">End Call</span>
+        </div>
       </div>
     </div>
   </div>
@@ -195,10 +280,13 @@
   <footer class="nexov-footer">
     <div class="footer-container">
       <div class="ft-brand">
-        <span class="brand-text">Nexov<span class="text-mint">AI</span> Hospital</span>
-        <span class="ft-sub">— Intelligent Voice Appointment Desk</span>
+        <div class="ft-logo-mark">✚</div>
+        <div>
+          <span class="brand-text">Nexov<span class="text-blue">Care</span> Hospital</span>
+          <span class="ft-sub">— Intelligent Outpatient Voice Desk</span>
+        </div>
       </div>
-      <p class="ft-copy">© 2026 NexovCare Hospital — Voice AI Doctor Appointment Assistant</p>
+      <p class="ft-copy">© 2026 NexovAI Hospital • NABH Accredited Multi-Specialty Healthcare Center</p>
     </div>
   </footer>
 
