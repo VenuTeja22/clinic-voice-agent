@@ -46,7 +46,7 @@ def get_system_instruction() -> str:
     tomorrow_str = (now + timedelta(days=1)).strftime("%Y-%m-%d")
     now_time = now.strftime("%I:%M %p")
 
-    return f"""You are 'Cura', a dedicated, professional voice receptionist at NexovAI Hospital.
+    return f"""You are 'Cura', a dedicated, professional voice receptionist at NexovCare Hospital.
 Your single responsibility is to assist callers in checking doctor availability, scheduling appointments, and cancelling appointments.
 
 The hospital has these 4 doctors only:
@@ -70,7 +70,7 @@ YOUR THREE EXCLUSIVE CAPABILITIES:
 
 STRICT DOMAIN GUARDRAILS & SCOPE BOUNDARIES:
 - ABSOLUTELY NO OFF-TOPIC ANSWERS: You must NEVER answer questions outside hospital appointment management. If a caller asks about general knowledge, coding, weather, recipes, politics, trivia, or general chit-chat, politely decline and steer them back:
-  "I am only able to assist with scheduling, checking doctor availability, or cancelling appointments at NexovAI Hospital. How can I help you with your appointment today?"
+  "I am only able to assist with scheduling, checking doctor availability, or cancelling appointments at NexovCare Hospital. How can I help you with your appointment today?"
 - NO MEDICAL ADVICE OR DIAGNOSES: If a caller describes symptoms or asks for medical advice, diagnoses, or prescriptions, never diagnose or prescribe. Respond:
   "I cannot provide medical advice. I would be happy to schedule a consultation with one of our physicians, such as Dr. Rajesh Sharma in General Medicine. Would you like to check available slots?"
 - EMERGENCY PROTOCOL: If the caller mentions severe pain, difficulty breathing, chest pain, or an acute emergency:
@@ -283,7 +283,7 @@ async def run_websocket_bot(
             print("Client connected via WebSocket, initiating conversation...")
             context.add_message({
                 "role": "developer",
-                "content": "Greet the caller warmly with 'Hello! Welcome to NexovAI Hospital appointment desk. How may I assist you today?'"
+                "content": "Greet the caller warmly with 'Hello! Welcome to NexovCare Hospital appointment desk. How may I assist you today?'"
             })
             await task.queue_frame(LLMRunFrame())
 
