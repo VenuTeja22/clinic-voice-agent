@@ -1,4 +1,4 @@
-# CuraClinic — Autonomous Voice AI Appointment Infrastructure
+# NexovAI Hospital — Autonomous Voice AI Appointment Infrastructure
 
 An autonomous, full-duplex conversational voice agent and real-time companion web console for healthcare appointment scheduling. Built for the **Forward Deployed Engineer (FDE)** role at **NexovAI**.
 
@@ -142,7 +142,7 @@ Open **`http://localhost:8000`** in your browser.
    - Click the glowing **"Start Voice Agent"** button. The futuristic terminal phone modal opens.
    - Allow browser microphone access.
 3. **Agent Greeting**:
-   - Cura immediately greets: *"Hello! Welcome to CuraClinic appointment desk. How may I assist you today?"*
+   - Cura immediately greets: *"Hello! Welcome to NexovAI Hospital appointment desk. How may I assist you today?"*
 4. **Availability Inquiry**:
    - Say: *"Can you check availability for Dr. Sarah Jenkins tomorrow?"*
    - Cura queries `check_doctor_availability` and speaks back open slots (e.g., 09:00 AM, 10:30 AM).

@@ -10,6 +10,8 @@ let isMuted = false;
 let callDuration = 0;
 let callTimer = null;
 let nextPlayTime = 0;
+let allAppointments = [];
+let currentFilter = 'ALL';
 
 // DOM Elements
 const startCallBtn = document.getElementById('startCallBtn');
@@ -40,8 +42,8 @@ async function fetchAppointments() {
   try {
     const res = await fetch('/api/appointments');
     if (!res.ok) return;
-    const appointments = await res.json();
-    renderAppointments(appointments);
+    allAppointments = await res.json();
+    renderAppointments();
   } catch (err) {
     console.error('Failed to load appointments:', err);
   }
@@ -82,16 +84,44 @@ function renderDoctors(doctors) {
   });
 }
 
-function renderAppointments(appointments) {
+function renderAppointments() {
   if (!appointmentsTableBody) return;
-  appointmentsCountBadge.textContent = `${appointments.length} Total`;
 
-  if (appointments.length === 0) {
-    appointmentsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:24px;">No appointments recorded yet. Call to book!</td></tr>`;
+  const totalCount = allAppointments.length;
+  const confirmedCount = allAppointments.filter((a) => a.status === 'CONFIRMED').length;
+  const cancelledCount = allAppointments.filter((a) => a.status === 'CANCELLED').length;
+
+  const countAll = document.getElementById('countAll');
+  const countConfirmed = document.getElementById('countConfirmed');
+  const countCancelled = document.getElementById('countCancelled');
+  if (countAll) countAll.textContent = totalCount;
+  if (countConfirmed) countConfirmed.textContent = confirmedCount;
+  if (countCancelled) countCancelled.textContent = cancelledCount;
+
+  // Filter list
+  const filtered = allAppointments.filter((apt) => {
+    if (currentFilter === 'CONFIRMED') return apt.status === 'CONFIRMED';
+    if (currentFilter === 'CANCELLED') return apt.status === 'CANCELLED';
+    return true;
+  });
+
+  if (appointmentsCountBadge) {
+    if (currentFilter === 'ALL') {
+      appointmentsCountBadge.textContent = `${totalCount} Total`;
+    } else if (currentFilter === 'CONFIRMED') {
+      appointmentsCountBadge.textContent = `${confirmedCount} Confirmed`;
+    } else {
+      appointmentsCountBadge.textContent = `${cancelledCount} Cancelled`;
+    }
+  }
+
+  if (filtered.length === 0) {
+    const label = currentFilter === 'ALL' ? 'recorded' : currentFilter.toLowerCase();
+    appointmentsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:28px;">No ${label} appointments found.</td></tr>`;
     return;
   }
 
-  appointmentsTableBody.innerHTML = appointments
+  appointmentsTableBody.innerHTML = filtered
     .map(
       (apt) => `
       <tr>
@@ -224,7 +254,7 @@ function playPCMChunk(arrayBuffer) {
   async function startCall() {
     try {
       startCallBtn.disabled = true;
-      startCallBtn.innerHTML = `<span>Connecting...</span>`;
+      startCallBtn.innerHTML = `<span class="call-icon">📞</span><span>Connecting...</span>`;
       transcriptBox.innerHTML = `<div class="transcript-placeholder">Connecting audio directly over WebSocket...</div>`;
       phoneModal.classList.remove('hidden');
       callStatusText.textContent = 'Connecting audio...';
@@ -320,7 +350,13 @@ function playPCMChunk(arrayBuffer) {
           endCall();
         } finally {
           startCallBtn.disabled = false;
-          startCallBtn.innerHTML = `<span class="phone-icon">📞</span><span>Start Voice Call</span>`;
+          startCallBtn.innerHTML = `
+            <span class="call-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/>
+              </svg>
+            </span>
+            <span>Start Voice Agent</span>`;
         }
       }
 
@@ -375,6 +411,17 @@ function playPCMChunk(arrayBuffer) {
       startCallBtn.addEventListener('click', startCall);
       endCallBtn.addEventListener('click', endCall);
       muteBtn.addEventListener('click', toggleMute);
+
+      // Filter Tabs for Appointments
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      filterTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          filterTabs.forEach((t) => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentFilter = tab.getAttribute('data-filter') || 'ALL';
+          renderAppointments();
+        });
+      });
 
       // Initialize Dashboard
       fetchDoctors();

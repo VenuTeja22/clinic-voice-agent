@@ -218,6 +218,17 @@ body.nexov-dark {
   transform: translateY(-1px);
 }
 
+.call-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.call-icon svg {
+  display: block;
+}
+
 .pulse-icon {
   font-size: 9px;
   animation: nexov-blink 1.2s infinite;
@@ -366,6 +377,75 @@ body.nexov-dark {
   background: rgba(103, 252, 198, 0.1);
   color: var(--nexov-mint);
   border: 1px solid rgba(103, 252, 198, 0.3);
+}
+
+.card-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-tabs {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.filter-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--nexov-text-muted);
+  font-family: var(--font-inter);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.filter-tab:hover {
+  color: var(--nexov-text-bright);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.filter-tab.active {
+  background: rgba(103, 252, 198, 0.12);
+  color: var(--nexov-mint);
+  border-color: rgba(103, 252, 198, 0.28);
+  box-shadow: 0 0 14px rgba(103, 252, 198, 0.18);
+}
+
+.tab-count {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-weight: 700;
+}
+
+.filter-tab.active .tab-count {
+  background: rgba(103, 252, 198, 0.25);
+  color: var(--nexov-mint);
+}
+
+.tab-count.count-confirmed {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
+.tab-count.count-cancelled {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
 }
 
 .neon-badge-neutral {

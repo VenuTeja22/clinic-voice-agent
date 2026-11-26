@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NexovAI — Clinic Voice Agent Infrastructure</title>
+  <title>NexovAI Hospital — Voice Appointment Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -20,24 +20,16 @@
     <div class="nav-container">
       <div class="nav-brand">
         <div class="brand-badge-dot"></div>
-        <span class="brand-text">Nexov<span class="text-mint">AI</span></span>
-        <span class="nav-pill">Voice Infrastructure</span>
-      </div>
-
-      <div class="nav-center-metrics">
-        <div class="metric-chip">
-          <span class="dot-pulse"></span>
-          <span>WebSocket Stream</span>
-        </div>
-        <div class="metric-chip">
-          <span class="chip-val">&lt;87ms</span>
-          <span class="chip-lbl">VAD Latency</span>
-        </div>
+        <span class="brand-text">Nexov<span class="text-mint">AI</span> Hospital</span>
       </div>
 
       <div class="nav-actions">
         <button id="startCallBtn" class="btn btn-mint-glow">
-          <span class="pulse-icon">●</span>
+          <span class="call-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/>
+            </svg>
+          </span>
           <span>Start Voice Agent</span>
         </button>
       </div>
@@ -49,24 +41,17 @@
     <section class="hero-section">
       <div class="hero-tagline">
         <span class="tag-sparkle">✦</span>
-        <span>NEXT-GEN HEALTHCARE INTELLIGENCE</span>
+        <span>24/7 INTELLIGENT APPOINTMENT DESK</span>
       </div>
 
       <h1 class="hero-title">
-        Autonomous Voice Infrastructure<br>
-        <span class="hero-gradient-text">for Clinic Appointment Booking.</span>
+        NexovAI Hospital<br>
+        <span class="hero-gradient-text">Doctor Appointment Desk.</span>
       </h1>
 
       <p class="hero-description">
-        Sub-100ms conversational AI receptionist running on pure WebSockets, Silero VAD, ElevenLabs Neural TTS, and Google Gemini reasoning.
+        Schedule, check availability, or manage doctor appointments seamlessly over real-time conversational voice.
       </p>
-
-      <div class="hero-badges">
-        <span class="spec-badge">⚡ Real-time Full Duplex</span>
-        <span class="spec-badge">🎙️ Spoken Phone Auth</span>
-        <span class="spec-badge">🔒 Guardrailed Scope</span>
-        <span class="spec-badge">📅 Live JSON Sync</span>
-      </div>
     </section>
 
     <!-- Operational Dashboard Grid -->
@@ -99,7 +84,24 @@
               <p class="card-sub">Real-time ledger updating instantaneously upon voice confirmation</p>
             </div>
           </div>
-          <span id="appointmentsCountBadge" class="neon-badge-neutral">0 Bookings</span>
+
+          <div class="card-actions-group">
+            <div class="filter-tabs" id="appointmentFilters">
+              <button class="filter-tab active" data-filter="ALL">
+                <span>All</span>
+                <span class="tab-count" id="countAll">0</span>
+              </button>
+              <button class="filter-tab" data-filter="CONFIRMED">
+                <span>Confirmed</span>
+                <span class="tab-count count-confirmed" id="countConfirmed">0</span>
+              </button>
+              <button class="filter-tab" data-filter="CANCELLED">
+                <span>Cancelled</span>
+                <span class="tab-count count-cancelled" id="countCancelled">0</span>
+              </button>
+            </div>
+            <span id="appointmentsCountBadge" class="neon-badge-neutral">0 Bookings</span>
+          </div>
         </div>
 
         <div class="table-wrapper">
@@ -136,8 +138,8 @@
         <div class="neon-orb">
           <div class="orb-core"></div>
         </div>
-        <h3 class="agent-title">Cura Voice Agent</h3>
-        <p class="agent-sub">NexovAI Voice Core v2.4.1</p>
+        <h3 class="agent-title">NexovAI Voice Assistant</h3>
+        <p class="agent-sub">NexovAI Hospital Desk</p>
 
         <!-- Status & Waveform -->
         <div class="call-status-row">
@@ -165,7 +167,7 @@
       <!-- Live Telephony Transcript Stream -->
       <div id="transcriptBox" class="terminal-transcript">
         <div class="transcript-placeholder">
-          <p class="dim-text">Speak to Cura to schedule, check, or cancel appointments.</p>
+          <p class="dim-text">Speak to schedule, check, or cancel hospital appointments.</p>
           <p class="hint-text">"Hi, is Dr. Sarah Jenkins available tomorrow?"</p>
         </div>
       </div>
@@ -186,10 +188,10 @@
   <footer class="nexov-footer">
     <div class="footer-container">
       <div class="ft-brand">
-        <span class="brand-text">Nexov<span class="text-mint">AI</span></span>
-        <span class="ft-sub">— Autonomous Voice Agent Infrastructure</span>
+        <span class="brand-text">Nexov<span class="text-mint">AI</span> Hospital</span>
+        <span class="ft-sub">— Intelligent Voice Appointment Desk</span>
       </div>
-      <p class="ft-copy">© 2026 NexovAI — Voice AI Doctor Appointment Assistant</p>
+      <p class="ft-copy">© 2026 NexovAI Hospital — Voice AI Doctor Appointment Assistant</p>
     </div>
   </footer>
 

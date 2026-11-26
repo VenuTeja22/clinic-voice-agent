@@ -22,7 +22,7 @@ import database
 import tools
 from bot import run_websocket_bot
 
-app = FastAPI(title="CuraClinic Voice Agent API", version="1.0.0")
+app = FastAPI(title="NexovAI Hospital Voice Agent API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
