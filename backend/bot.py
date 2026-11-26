@@ -80,6 +80,10 @@ CONVERSATIONAL RULES:
 - Identification: Callers are identified ONLY by the phone number they speak out loud. Never ask for email, passwords, login, or OTP.
 - MANDATORY PHONE CONFIRMATION: Before you book or cancel an appointment, you MUST repeat the phone number back to the caller to confirm it (e.g., 'Just to confirm, I have your phone number as 9 8 7, 6 5 4, 3 2 1 0. Is that correct?').
 - Only execute `book_appointment` or `cancel_appointment` AFTER the caller explicitly confirms.
+- MULTIPLE APPOINTMENTS CANCELLATION:
+  When a caller wants to cancel, call `cancel_appointment(patient_phone=...)`.
+  If the tool returns `needs_clarification: True` with multiple appointments, read out all the appointments found and ask the caller which specific one they want to cancel (e.g. 'I found 2 active appointments under your number: one with Dr. Sarah Jenkins on Nov 26 at 10:30 AM, and one with Dr. Rajesh Sharma on Nov 27 at 02:00 PM. Which one would you like to cancel?').
+  Once the caller specifies, call `cancel_appointment` again including `doctor_name` or `slot_time` to cancel only that particular appointment.
 - Conversational tone: Speak naturally, warmly, and concisely (1-2 sentences per turn), like a real receptionist. Avoid robotic or overly long lists.
 """
 
@@ -196,9 +200,12 @@ async def run_websocket_bot(
 
         tool_cancel_appointment = FunctionSchema(
             name="cancel_appointment",
-            description="Cancel an active appointment using the caller's confirmed phone number.",
+            description="Cancel an active appointment using the caller's confirmed phone number. If caller has multiple appointments, doctor_name or slot_time/slot_date can specify which one to cancel.",
             properties={
-                "patient_phone": {"type": "string", "description": "Caller's confirmed phone number"}
+                "patient_phone": {"type": "string", "description": "Caller's confirmed phone number"},
+                "doctor_name": {"type": "string", "description": "Optional doctor name to cancel specific appointment if caller has multiple"},
+                "slot_time": {"type": "string", "description": "Optional slot time to cancel specific appointment if caller has multiple"},
+                "slot_date": {"type": "string", "description": "Optional slot date to cancel specific appointment if caller has multiple"}
             },
             required=["patient_phone"]
         )
@@ -236,7 +243,12 @@ async def run_websocket_bot(
         async def handle_cancel_appointment(params):
             args = params.arguments
             print(f"\n🔧 [TOOL] Cancelling Appointment: {args}", flush=True)
-            res = tools.cancel_appointment(patient_phone=args.get("patient_phone", ""))
+            res = tools.cancel_appointment(
+                patient_phone=args.get("patient_phone", ""),
+                doctor_name=args.get("doctor_name"),
+                slot_time=args.get("slot_time"),
+                slot_date=args.get("slot_date")
+            )
             print(f"🔧 [TOOL RESULT]: {res.get('message') or res.get('error')}", flush=True)
             if res.get("success") and broadcast_fn:
                 await broadcast_fn({"type": "database_update", "action": "cancelled", "data": res})

@@ -183,9 +183,16 @@ def book_appointment(patient_phone: str, doctor_name: str, slot_time: str, slot_
         "message": f"Appointment successfully confirmed with {doc_display} on {target_slot['date']} at {target_slot['time']}."
     }
 
-def cancel_appointment(patient_phone: str) -> Dict[str, Any]:
+def cancel_appointment(
+    patient_phone: str,
+    doctor_name: Optional[str] = None,
+    slot_time: Optional[str] = None,
+    slot_date: Optional[str] = None
+) -> Dict[str, Any]:
     """
-    Cancels existing appointment in JSON store for phone number.
+    Cancels an active confirmed appointment in the JSON store for the phone number.
+    If multiple confirmed appointments exist under the same number and the caller has
+    not specified which one, returns all active appointments and asks which one to cancel.
     """
     clean_phone = normalize_phone(patient_phone)
     if not clean_phone:
@@ -198,22 +205,67 @@ def cancel_appointment(patient_phone: str) -> Dict[str, Any]:
     appointments = data.get("appointments", [])
     slots = data.get("slots", [])
 
-    # Find last confirmed appointment for this phone
-    target_apt = None
-    for apt in reversed(appointments):
-        if clean_phone in apt.get("patient_phone", "") and apt.get("status") == "CONFIRMED":
-            target_apt = apt
-            break
+    # Find all active confirmed appointments for this phone number
+    user_confirmed = [
+        apt for apt in appointments
+        if clean_phone in normalize_phone(apt.get("patient_phone", "")) and apt.get("status") == "CONFIRMED"
+    ]
 
-    if not target_apt:
+    if not user_confirmed:
         return {
             "success": False,
-            "error": f"No active confirmed appointment found for phone number {clean_phone}."
+            "error": f"No active confirmed appointments found for phone number {clean_phone}."
         }
 
+    # Filter by specific doctor/time/date if provided
+    matching = user_confirmed
+    if doctor_name:
+        d_lower = doctor_name.lower().strip()
+        matching = [a for a in matching if d_lower in a.get("doctor_name", "").lower()]
+
+    if slot_time:
+        t_clean = slot_time.lower().strip()
+        matching = [a for a in matching if t_clean in a.get("time", "").lower() or t_clean == a.get("time", "").lower()]
+
+    if slot_date:
+        d_resolved = resolve_date_input(slot_date)
+        if d_resolved:
+            matching = [a for a in matching if a.get("date") == d_resolved]
+
+    # If multiple appointments remain because the caller has not clarified which one:
+    if len(matching) > 1:
+        details = [
+            f"with {a['doctor_name']} on {a['date']} at {a['time']}"
+            for a in matching
+        ]
+        return {
+            "success": False,
+            "needs_clarification": True,
+            "count": len(matching),
+            "appointments": [
+                {
+                    "appointment_id": a["id"],
+                    "doctor_name": a["doctor_name"],
+                    "date": a["date"],
+                    "time": a["time"],
+                    "specialty": a.get("specialty", "")
+                }
+                for a in matching
+            ],
+            "message": f"I found {len(matching)} active appointments under your number: " + "; and ".join(details) + ". Which one would you like to cancel?"
+        }
+
+    if not matching:
+        return {
+            "success": False,
+            "error": f"Could not find a confirmed appointment matching that doctor or time under phone number {clean_phone}."
+        }
+
+    # Exactly 1 appointment to cancel
+    target_apt = matching[0]
     target_apt["status"] = "CANCELLED"
 
-    # Free up slot
+    # Free up the slot in the slots registry
     for s in slots:
         if s["doctor_id"] == target_apt["doctor_id"] and s["date"] == target_apt["date"] and s["time"] == target_apt["time"]:
             s["is_booked"] = False

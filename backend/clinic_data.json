@@ -347,17 +347,6 @@
       "status": "CANCELLED"
     },
     {
-      "id": 7,
-      "patient_name": "Caller",
-      "patient_phone": "7842816423",
-      "doctor_id": 4,
-      "doctor_name": "Dr. Michael Chang",
-      "specialty": "Pediatrics",
-      "date": "2026-11-26",
-      "time": "02:00 PM",
-      "status": "CANCELLED"
-    },
-    {
       "id": 8,
       "patient_name": "Caller",
       "patient_phone": "22221333",
