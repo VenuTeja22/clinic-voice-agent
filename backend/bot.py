@@ -27,7 +27,6 @@ from pipecat.frames.frames import (
     LLMRunFrame
 )
 from pipecat.audio.vad.silero import SileroVADAnalyzer
-from pipecat.audio.vad.vad_analyzer import VADParams
 from pipecat.processors.audio.vad_processor import VADProcessor
 from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
 from pipecat.services.elevenlabs.stt import ElevenLabsSTTService
@@ -122,14 +121,7 @@ async def run_websocket_bot(
 
     async with aiohttp.ClientSession() as aiohttp_session:
         # 1. Transport (FastAPI WebSocket + Silero VAD)
-        vad = SileroVADAnalyzer(
-            params=VADParams(
-                confidence=0.7,
-                start_secs=0.2,
-                stop_secs=0.7,
-                min_volume=0.6
-            )
-        )
+        vad = SileroVADAnalyzer()
         transport = FastAPIWebsocketTransport(
             websocket=websocket,
             params=FastAPIWebsocketParams(
