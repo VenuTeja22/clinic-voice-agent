@@ -21,42 +21,36 @@ const DOCTOR_DETAILS = {
   'Dr. Sarah Jenkins': {
     credentials: 'MD, FACC',
     dept: 'Heart & Vascular Center',
-    deptIcon: '🫀',
     experience: '15 Yrs Exp',
     rating: '4.9 ★'
   },
   'Dr. Rajesh Sharma': {
     credentials: 'MBBS, MD',
     dept: 'Internal Medicine Care',
-    deptIcon: '🩺',
     experience: '18 Yrs Exp',
     rating: '4.9 ★'
   },
   'Dr. Emily Watson': {
     credentials: 'MD, FAAD',
     dept: 'Advanced Skin & Laser Clinic',
-    deptIcon: '🔬',
     experience: '12 Yrs Exp',
     rating: '4.8 ★'
   },
   'Dr. Michael Chang': {
     credentials: 'MD, FAAP',
     dept: 'Child Health Pavilion',
-    deptIcon: '🧸',
     experience: '14 Yrs Exp',
     rating: '4.9 ★'
   },
   'Dr. Ananya Iyer': {
     credentials: 'MS, DNB (Ortho)',
     dept: 'Bone & Joint Institute',
-    deptIcon: '🦴',
     experience: '16 Yrs Exp',
     rating: '4.9 ★'
   },
   'Dr. David Miller': {
     credentials: 'MD, DM (Neuro)',
     dept: 'Brain & Spine Institute',
-    deptIcon: '🧠',
     experience: '13 Yrs Exp',
     rating: '4.8 ★'
   }
@@ -141,7 +135,6 @@ function renderDoctors(doctors) {
     const docMeta = DOCTOR_DETAILS[doc.name] || {
       credentials: 'MD Specialist',
       dept: doc.specialty,
-      deptIcon: '🩺',
       experience: '10+ Yrs Exp',
       rating: '4.8 ★'
     };
@@ -183,7 +176,7 @@ function renderDoctors(doctors) {
               <span class="doc-name">${doc.name}</span>
               <span class="doc-cred-tag">${docMeta.credentials}</span>
             </div>
-            <div class="doc-dept">${docMeta.deptIcon} ${doc.specialty} • ${docMeta.dept}</div>
+            <div class="doc-dept">${doc.specialty} • ${docMeta.dept}</div>
             <div class="doc-room-row">
               <span>${docMeta.experience}</span>
               <span>•</span>
@@ -194,11 +187,11 @@ function renderDoctors(doctors) {
         <div class="doc-status-col">
           ${isOnLeave
             ? `<span class="badge-leave">On Leave</span>
-               <span class="leave-duty-dot">○ On Leave</span>`
+               <span class="leave-duty-dot">On Leave</span>`
             : `<span class="${totalOpen > 0 ? 'badge-open' : 'badge-busy'}">
                  ${totalOpen} Open
                </span>
-               <span class="clinic-duty-dot">● In Clinic</span>`
+               <span class="clinic-duty-dot">In Clinic</span>`
           }
         </div>
       </div>
@@ -206,7 +199,13 @@ function renderDoctors(doctors) {
       <div class="doc-schedule-section">
         ${isOnLeave
           ? `<div class="doctor-leave-banner">
-               <span class="leave-icon">🌴</span>
+               <span class="leave-icon">
+                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                   <circle cx="12" cy="12" r="10"></circle>
+                   <line x1="12" y1="8" x2="12" y2="12"></line>
+                   <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                 </svg>
+               </span>
                <div class="leave-text">
                  <span class="leave-title">Physician on Scheduled Leave</span>
                  <span class="leave-sub">No outpatient consultation slots for Today & Tomorrow.</span>
@@ -281,14 +280,13 @@ function renderAppointments() {
     .map((apt) => {
       const docMeta = DOCTOR_DETAILS[apt.doctor_name] || {
         credentials: 'MD',
-        dept: apt.specialty,
-        deptIcon: '🩺'
+        dept: apt.specialty
       };
 
       return `
       <tr>
         <td class="col-phone">
-          <span class="phone-badge">📞 ${apt.patient_phone}</span>
+          <span class="phone-badge">${apt.patient_phone}</span>
         </td>
         <td class="col-specialist">
           <div class="doc-table-meta">
@@ -297,17 +295,17 @@ function renderAppointments() {
           </div>
         </td>
         <td class="col-dept">
-          <span class="dept-pill">${docMeta.deptIcon} ${apt.specialty}</span>
+          <span class="dept-pill">${apt.specialty}</span>
         </td>
         <td class="col-time">
           <span class="time-stamp-val">
-            <span class="date-str">📅 ${apt.date}</span>
-            <span class="time-str">⏰ ${apt.time}</span>
+            <span class="date-str">${apt.date}</span>
+            <span class="time-str">${apt.time}</span>
           </span>
         </td>
         <td class="col-status">
           <span class="status-tag ${apt.status === 'CONFIRMED' ? 'confirmed' : 'cancelled'}">
-            ${apt.status === 'CONFIRMED' ? '✓ Confirmed' : '✕ Cancelled'}
+            ${apt.status === 'CONFIRMED' ? 'Confirmed' : 'Cancelled'}
           </span>
         </td>
       </tr>
@@ -494,7 +492,14 @@ function stopWaveformVisualizer() {
 async function startCall() {
   try {
     startCallBtn.disabled = true;
-    startCallBtn.innerHTML = `<span class="call-icon">📞</span><span>Connecting...</span>`;
+    startCallBtn.innerHTML = `
+      <span class="call-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z" />
+        </svg>
+      </span>
+      <span>Connecting...</span>
+    `;
     transcriptBox.innerHTML = `<div class="transcript-placeholder">Connecting audio directly over WebSocket...</div>`;
     phoneModal.classList.remove('hidden');
     callStatusText.textContent = 'Connecting audio...';
@@ -657,11 +662,26 @@ function toggleMute() {
   const muteLabel = document.getElementById('muteBtnLabel');
   if (isMuted) {
     muteBtn.classList.add('active');
-    muteBtn.innerHTML = '<span class="btn-icon">🔇</span>';
+    muteBtn.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+        <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+    `;
     if (muteLabel) muteLabel.textContent = 'Unmute';
   } else {
     muteBtn.classList.remove('active');
-    muteBtn.innerHTML = '<span class="btn-icon">🎤</span>';
+    muteBtn.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+    `;
     if (muteLabel) muteLabel.textContent = 'Mute';
   }
 }

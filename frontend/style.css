@@ -14,32 +14,43 @@
   --hospital-card-shadow-hover: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
 
   /* Clinical Trust Colors */
-  --hospital-primary: #0284c7;        /* Medical Sapphire Blue */
-  --hospital-primary-dark: #0369a1;   /* Deep Ocean Blue */
-  --hospital-primary-light: #e0f2fe;  /* Ice Blue Tint */
+  --hospital-primary: #0284c7;
+  /* Medical Sapphire Blue */
+  --hospital-primary-dark: #0369a1;
+  /* Deep Ocean Blue */
+  --hospital-primary-light: #e0f2fe;
+  /* Ice Blue Tint */
   --hospital-primary-border: #bae6fd;
-  
-  --hospital-teal: #0d9488;           /* Clinical Teal */
+
+  --hospital-teal: #0d9488;
+  /* Clinical Teal */
   --hospital-teal-light: #ccfbf1;
-  
-  --hospital-emerald: #10b981;        /* In-Clinic / Confirmed */
+
+  --hospital-emerald: #10b981;
+  /* In-Clinic / Confirmed */
   --hospital-emerald-dark: #065f46;
   --hospital-emerald-light: #ecfdf5;
   --hospital-emerald-border: #a7f3d0;
 
-  --hospital-crimson: #dc2626;        /* Emergency Care / Cancelled */
+  --hospital-crimson: #dc2626;
+  /* Emergency Care / Cancelled */
   --hospital-crimson-dark: #b91c1c;
   --hospital-crimson-light: #fef2f2;
   --hospital-crimson-border: #fecaca;
 
-  --hospital-amber: #d97706;          /* Rating / Pending */
+  --hospital-amber: #d97706;
+  /* Rating / Pending */
   --hospital-amber-light: #fffbeb;
 
   /* Typography */
-  --hospital-text-main: #0f172a;       /* Deep Slate Heading */
-  --hospital-text-body: #334155;       /* Readable Slate Body */
-  --hospital-text-muted: #64748b;      /* Secondary Subtext */
-  --hospital-text-dim: #94a3b8;        /* Subtle Captions */
+  --hospital-text-main: #0f172a;
+  /* Deep Slate Heading */
+  --hospital-text-body: #334155;
+  /* Readable Slate Body */
+  --hospital-text-muted: #64748b;
+  /* Secondary Subtext */
+  --hospital-text-dim: #94a3b8;
+  /* Subtle Captions */
 
   --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-space: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -119,8 +130,17 @@ body.hospital-theme {
 }
 
 @keyframes hospital-blink {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.35; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
 }
 
 .ticker-sep {
@@ -367,10 +387,16 @@ body.hospital-theme {
 }
 
 .hl-icon {
-  font-size: 1.6rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--hospital-primary-light);
+  color: var(--hospital-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--hospital-primary-border);
 }
 
 .hl-meta {
@@ -558,17 +584,23 @@ body.hospital-theme {
   border: 1px solid var(--hospital-card-border);
   border-radius: 14px;
   padding: 18px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .doctor-card:hover {
-  border-color: var(--hospital-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(2, 132, 199, 0.1);
+  border-color: #93c5fd;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -6px rgba(2, 132, 199, 0.12), 0 8px 12px -4px rgba(15, 23, 42, 0.03);
+}
+
+.doctor-card:hover .doc-name {
+  color: var(--hospital-primary);
 }
 
 .doc-card-header {
@@ -718,10 +750,37 @@ body.hospital-theme {
   color: #64748b;
 }
 
+@keyframes clinicalPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
 .leave-duty-dot {
   font-size: 0.66rem;
-  font-weight: 600;
-  color: #d97706;
+  font-weight: 700;
+  color: #b45309;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.leave-duty-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid #d97706;
+  display: inline-block;
 }
 
 .doctor-leave-banner {
@@ -736,8 +795,16 @@ body.hospital-theme {
 }
 
 .leave-icon {
-  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  border: 1px solid #fde68a;
 }
 
 .leave-text {
@@ -761,8 +828,21 @@ body.hospital-theme {
 
 .clinic-duty-dot {
   font-size: 0.66rem;
-  font-weight: 600;
-  color: var(--hospital-emerald);
+  font-weight: 700;
+  color: var(--hospital-emerald-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.clinic-duty-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hospital-emerald);
+  display: inline-block;
+  animation: clinicalPulse 2s infinite ease-in-out;
 }
 
 .doc-schedule-section {
@@ -894,7 +974,8 @@ body.hospital-theme {
   font-size: 0.84rem;
   text-align: left;
   background: #ffffff;
-  table-layout: auto; /* Auto layout prevents ANY overlapping or content overflow */
+  table-layout: auto;
+  /* Auto layout prevents ANY overlapping or content overflow */
 }
 
 .nexov-table th {
@@ -920,38 +1001,69 @@ body.hospital-theme {
 }
 
 /* Explicit Minimum Column Widths to Ensure Ample Space & Prevent Crowding */
-.th-phone, .col-phone {
+.th-phone,
+.col-phone {
   min-width: 160px;
   width: 160px;
 }
 
-.th-specialist, .col-specialist {
+.th-specialist,
+.col-specialist {
   min-width: 230px;
   white-space: normal;
 }
 
-.th-dept, .col-dept {
+.th-dept,
+.col-dept {
   min-width: 170px;
   width: 170px;
 }
 
-.th-time, .col-time {
+.th-time,
+.col-time {
   min-width: 200px;
   width: 200px;
 }
 
-.th-type, .col-type {
+.th-type,
+.col-type {
   min-width: 150px;
   width: 150px;
 }
 
-.th-status, .col-status {
+.th-status,
+.col-status {
   min-width: 130px;
   width: 130px;
 }
 
-.nexov-table tr:hover td {
+.nexov-table tbody tr {
+  transition: background-color 0.18s ease;
+  animation: tableRowFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tableRowFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nexov-table tbody tr:hover td {
   background: #f8fafc;
+}
+
+.nexov-table tbody tr:hover .doc-table-name {
+  color: var(--hospital-primary);
+}
+
+.nexov-table tbody tr:hover .phone-badge {
+  border-color: #93c5fd;
+  background: #e0f2fe;
 }
 
 .phone-badge {
@@ -1041,12 +1153,20 @@ body.hospital-theme {
 .status-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   padding: 4px 12px;
   border-radius: 9999px;
   font-size: 0.74rem;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.status-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 .status-tag.confirmed {
@@ -1055,10 +1175,18 @@ body.hospital-theme {
   border: 1px solid var(--hospital-emerald-border);
 }
 
+.status-tag.confirmed::before {
+  background: var(--hospital-emerald);
+}
+
 .status-tag.cancelled {
   background: var(--hospital-crimson-light);
   color: var(--hospital-crimson-dark);
   border: 1px solid var(--hospital-crimson-border);
+}
+
+.status-tag.cancelled::before {
+  background: var(--hospital-crimson);
 }
 
 .loading-state {
@@ -1074,20 +1202,26 @@ body.hospital-theme {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(10px);
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 16px;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-backdrop.hidden {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
-/* Sleek Medical Smartphone Frame */
+/* Sleek Medical Smartphone Frame with Spring Physics */
 .nexov-terminal-phone {
   width: 100%;
   max-width: 390px;
@@ -1100,6 +1234,14 @@ body.hospital-theme {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  transform: scale(1) translateY(0);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+}
+
+.modal-backdrop.hidden .nexov-terminal-phone {
+  transform: scale(0.92) translateY(20px);
+  opacity: 0;
+}
 }
 
 /* Top Modal Close Button */
@@ -1216,8 +1358,15 @@ body.hospital-theme {
 }
 
 @keyframes hospital-ring-pulse {
-  0% { transform: scale(0.9); opacity: 0.8; }
-  100% { transform: scale(1.3); opacity: 0; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
 }
 
 .agent-title {
