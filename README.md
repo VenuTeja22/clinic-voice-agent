@@ -23,7 +23,7 @@ flowchart LR
     Broadcaster -->|Live Events /ws| Dashboard["Clinical Hospital Live Dashboard"]
 ```
 
-### How the Pipeline Works (Step-by-Step)
+### How the Pipeline Works?
 
 Here is what happens under the hood from the moment a caller starts a conversation:
 
