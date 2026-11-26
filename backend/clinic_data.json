@@ -84,7 +84,7 @@
       "doctor_name": "Dr. Rajesh Sharma",
       "date": "2026-11-26",
       "time": "04:30 PM",
-      "is_booked": false
+      "is_booked": true
     },
     {
       "id": 9,
@@ -228,6 +228,28 @@
       "date": "2026-11-26",
       "time": "02:00 PM",
       "status": "CANCELLED"
+    },
+    {
+      "id": 8,
+      "patient_name": "Caller",
+      "patient_phone": "22221333",
+      "doctor_id": 1,
+      "doctor_name": "Dr. Sarah Jenkins",
+      "specialty": "Cardiology",
+      "date": "2026-11-26",
+      "time": "09:00 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 9,
+      "patient_name": "Caller",
+      "patient_phone": "9618642097",
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "specialty": "General Medicine",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "status": "CONFIRMED"
     }
   ]
 }
