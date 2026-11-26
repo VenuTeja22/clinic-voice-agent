@@ -134,7 +134,7 @@ Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## 5. Demo Walkthrough Flow (For Video Recording)
+## 5. Demo Walkthrough Flow 
 
 1. **Dashboard Overview**:
    - Navigate to `http://localhost:8000`. The hospital portal displays the 24/7 emergency ribbon, active clinical specialists, real-time Today & Tomorrow schedule grid, and the live Patient Appointment Ledger.
@@ -172,5 +172,4 @@ Every conversational turn is logged directly to the server terminal with clear s
 🗣️  [CALLER]: Yes that is correct.
 🤖 [CURA ASSISTANT]: You're all set! I have booked your appointment with Dr. Sarah Jenkins for tomorrow at 10:30 AM.
 ```
-
 ---
