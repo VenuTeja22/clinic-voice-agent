@@ -188,7 +188,7 @@
       "doctor_name": "Dr. Rajesh Sharma",
       "date": "2026-11-27",
       "time": "09:00 AM",
-      "is_booked": false
+      "is_booked": true
     },
     {
       "id": 22,
@@ -387,6 +387,39 @@
       "doctor_name": "Dr. Sarah Jenkins",
       "specialty": "Cardiology",
       "date": "2026-11-26",
+      "time": "10:30 AM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 11,
+      "patient_name": "Caller",
+      "patient_phone": "1234567890",
+      "doctor_id": 4,
+      "doctor_name": "Dr. Michael Chang",
+      "specialty": "Pediatrics",
+      "date": "2026-11-26",
+      "time": "04:30 PM",
+      "status": "CANCELLED"
+    },
+    {
+      "id": 12,
+      "patient_name": "Caller",
+      "patient_phone": "1234567890",
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "specialty": "General Medicine",
+      "date": "2026-11-27",
+      "time": "09:00 AM",
+      "status": "CONFIRMED"
+    },
+    {
+      "id": 13,
+      "patient_name": "Stephanie",
+      "patient_phone": "1234567890",
+      "doctor_id": 2,
+      "doctor_name": "Dr. Rajesh Sharma",
+      "specialty": "General Medicine",
+      "date": "2026-11-27",
       "time": "10:30 AM",
       "status": "CANCELLED"
     }

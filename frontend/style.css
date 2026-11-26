@@ -460,80 +460,200 @@ body.nexov-dark {
 /* Doctors Grid */
 .doctors-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .doctor-card {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  padding: 18px;
-  transition: all 0.2s ease;
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .doctor-card:hover {
   background: rgba(103, 252, 198, 0.03);
   border-color: rgba(103, 252, 198, 0.3);
   transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.doc-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 14px;
+}
+
+.doc-avatar-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doc-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(103, 252, 198, 0.08);
+  border: 1px solid rgba(103, 252, 198, 0.25);
+  color: var(--nexov-mint);
+  font-family: var(--font-space);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .doc-name {
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: white;
 }
 
 .doc-spec {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 500;
   color: var(--nexov-mint);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
-.slots-container {
-  margin-top: 14px;
+.badge-open {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(103, 252, 198, 0.1);
+  color: var(--nexov-mint);
+  border: 1px solid rgba(103, 252, 198, 0.28);
 }
 
-.slots-label {
-  font-size: 0.7rem;
-  color: var(--nexov-text-dim);
-  margin-bottom: 6px;
+.badge-busy {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--nexov-text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.slot-pills {
+.doc-schedule-section {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.slot-pill {
-  font-size: 0.68rem;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-family: monospace;
+.day-slot-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.slot-pill.available {
-  background: rgba(103, 252, 198, 0.08);
-  color: #a7f3d0;
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  padding: 0 2px;
+}
+
+.day-title {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--nexov-text-bright);
+}
+
+.day-subdate {
+  color: var(--nexov-text-dim);
+  font-size: 0.7rem;
+}
+
+.time-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+}
+
+.time-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.18s ease;
+}
+
+.time-chip-val {
+  font-family: var(--font-space);
+  letter-spacing: -0.01em;
+}
+
+.chip-status-tag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* 1. Available: clean glowing mint */
+.time-chip.available {
+  background: rgba(103, 252, 198, 0.05);
   border: 1px solid rgba(103, 252, 198, 0.25);
-  font-weight: 500;
+  color: #d1fae5;
 }
 
-.slot-pill.booked {
-  background: rgba(255, 255, 255, 0.03);
+.time-chip.available:hover {
+  background: rgba(103, 252, 198, 0.12);
+  border-color: rgba(103, 252, 198, 0.5);
+}
+
+.time-chip.available .chip-status-tag {
+  background: rgba(103, 252, 198, 0.16);
+  color: var(--nexov-mint);
+}
+
+/* 2. Booked: clean dark subtle chip, NO strikethrough */
+.time-chip.booked {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #64748b;
+}
+
+.time-chip.booked .chip-status-tag {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+/* 3. Passed / Elapsed: clean subtle dimmed chip, NO strikethrough */
+.time-chip.past {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   color: #475569;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  text-decoration: line-through;
+  opacity: 0.65;
 }
 
-.slot-pill.past {
-  background: rgba(255, 255, 255, 0.02);
-  color: #4b5563;
-  border: 1px dashed rgba(255, 255, 255, 0.08);
-  opacity: 0.55;
-  text-decoration: line-through;
+.time-chip.past .chip-status-tag {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+}
+
+.empty-slots-msg {
+  font-size: 0.72rem;
+  color: var(--nexov-text-dim);
+  padding: 8px 0;
+  text-align: center;
 }
 
 /* Table */
@@ -731,29 +851,18 @@ body.nexov-dark {
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 24px;
+  height: 28px;
   margin-top: 10px;
 }
 
 .bar {
-  width: 3px;
+  width: 3.5px;
+  height: 4px;
   background: var(--nexov-mint);
   box-shadow: 0 0 8px rgba(103, 252, 198, 0.6);
   border-radius: 4px;
+  transition: height 0.08s ease;
 }
-
-@keyframes nexov-wave {
-  0%, 100% { height: 6px; }
-  50% { height: 22px; }
-}
-
-.b1 { animation: nexov-wave 1s infinite ease-in-out; }
-.b2 { animation: nexov-wave 0.8s infinite ease-in-out 0.15s; }
-.b3 { animation: nexov-wave 1.3s infinite ease-in-out 0.3s; }
-.b4 { animation: nexov-wave 0.9s infinite ease-in-out 0.1s; }
-.b5 { animation: nexov-wave 1.1s infinite ease-in-out 0.25s; }
-.b6 { animation: nexov-wave 0.7s infinite ease-in-out 0.2s; }
-.b7 { animation: nexov-wave 1.2s infinite ease-in-out 0.35s; }
 
 /* Toast */
 .terminal-toast {

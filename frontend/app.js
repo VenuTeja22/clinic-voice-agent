@@ -12,6 +12,9 @@ let callTimer = null;
 let nextPlayTime = 0;
 let allAppointments = [];
 let currentFilter = 'ALL';
+let inputAnalyser = null;
+let outputAnalyser = null;
+let animFrameId = null;
 
 // DOM Elements
 const startCallBtn = document.getElementById('startCallBtn');
@@ -70,46 +73,86 @@ function renderDoctors(doctors) {
   tmrw.setDate(tmrw.getDate() + 1);
   const tomorrowStr = `${tmrw.getFullYear()}-${pad(tmrw.getMonth() + 1)}-${pad(tmrw.getDate())}`;
 
+  const todayMonthName = now.toLocaleString('en-US', { month: 'short' });
+  const tmrwMonthName = tmrw.toLocaleString('en-US', { month: 'short' });
+  const todayDisplayDate = `${todayMonthName} ${now.getDate()}`;
+  const tmrwDisplayDate = `${tmrwMonthName} ${tmrw.getDate()}`;
+
   doctors.forEach((doc) => {
-    // Only display active slots for today and tomorrow
-    const activeDocSlots = (doc.slots || []).filter(
-      (s) => s.date === todayStr || s.date === tomorrowStr
-    );
-    const availableUpcomingSlots = activeDocSlots.filter(
-      (s) => !s.is_booked && !isSlotPast(s.date, s.time)
-    );
+    const todaySlots = (doc.slots || []).filter((s) => s.date === todayStr);
+    const tmrwSlots = (doc.slots || []).filter((s) => s.date === tomorrowStr);
+
+    const availableToday = todaySlots.filter((s) => !s.is_booked && !isSlotPast(s.date, s.time)).length;
+    const availableTmrw = tmrwSlots.filter((s) => !s.is_booked && !isSlotPast(s.date, s.time)).length;
+    const totalOpen = availableToday + availableTmrw;
+
+    // Doctor Initials (e.g. Dr. Sarah Jenkins -> SJ)
+    const nameParts = doc.name.replace(/^Dr\.\s*/i, '').trim().split(' ');
+    const initials = nameParts.map((p) => p[0]).join('').slice(0, 2).toUpperCase() || 'DR';
+
+    function buildChips(slotsList) {
+      if (!slotsList.length) {
+        return `<div class="empty-slots-msg">No slots scheduled</div>`;
+      }
+      return slotsList.map((s) => {
+        const isPast = isSlotPast(s.date, s.time);
+        let chipClass = 'available';
+        let statusTag = 'Open';
+
+        if (s.is_booked) {
+          chipClass = 'booked';
+          statusTag = 'Booked';
+        } else if (isPast) {
+          chipClass = 'past';
+          statusTag = 'Ended';
+        }
+
+        return `
+          <div class="time-chip ${chipClass}">
+            <span class="time-chip-val">${s.time}</span>
+            <span class="chip-status-tag">${statusTag}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
     const card = document.createElement('div');
     card.className = 'doctor-card';
-
-    const slotPills = activeDocSlots
-      .map((s) => {
-        const isPast = isSlotPast(s.date, s.time);
-        let statusClass = 'available';
-        let titleExtra = '';
-        if (s.is_booked) {
-          statusClass = 'booked';
-          titleExtra = ' (Booked)';
-        } else if (isPast) {
-          statusClass = 'past';
-          titleExtra = ' (Passed)';
-        }
-        const dayLabel = s.date === tomorrowStr ? 'Tomorrow' : 'Today';
-        return `<span class="slot-pill ${statusClass}" title="${s.date} ${s.time}${titleExtra}">${dayLabel} ${s.time}</span>`;
-      })
-      .join('');
-
     card.innerHTML = `
-      <div>
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div class="doc-card-header">
+        <div class="doc-avatar-group">
+          <div class="doc-avatar">${initials}</div>
           <div>
             <div class="doc-name">${doc.name}</div>
             <div class="doc-spec">${doc.specialty}</div>
           </div>
-          <span class="badge">${availableUpcomingSlots.length} open</span>
         </div>
-        <div class="slots-container">
-          <div class="slots-label">Doctor Schedule (Today & Tomorrow)</div>
-          <div class="slot-pills">${slotPills}</div>
+        <span class="${totalOpen > 0 ? 'badge-open' : 'badge-busy'}">
+          ${totalOpen} Open
+        </span>
+      </div>
+
+      <div class="doc-schedule-section">
+        <!-- Today Group -->
+        <div class="day-slot-group">
+          <div class="day-header">
+            <span class="day-title">Today</span>
+            <span class="day-subdate">${todayDisplayDate}</span>
+          </div>
+          <div class="time-chips-grid">
+            ${buildChips(todaySlots)}
+          </div>
+        </div>
+
+        <!-- Tomorrow Group -->
+        <div class="day-slot-group">
+          <div class="day-header">
+            <span class="day-title">Tomorrow</span>
+            <span class="day-subdate">${tmrwDisplayDate}</span>
+          </div>
+          <div class="time-chips-grid">
+            ${buildChips(tmrwSlots)}
+          </div>
         </div>
       </div>
     `;
@@ -251,10 +294,21 @@ function downsampleBuffer(buffer, inSampleRate, outSampleRate) {
 }
 
 // Audio Playback Function (Streams 24kHz raw PCM from Assistant)
-function playPCMChunk(arrayBuffer) {
+function getOrCreateOutputAnalyser() {
   if (!audioOutputContext) {
     audioOutputContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
   }
+  if (!outputAnalyser) {
+    outputAnalyser = audioOutputContext.createAnalyser();
+    outputAnalyser.fftSize = 64;
+    outputAnalyser.smoothingTimeConstant = 0.5;
+    outputAnalyser.connect(audioOutputContext.destination);
+  }
+  return outputAnalyser;
+}
+
+function playPCMChunk(arrayBuffer) {
+  const analyser = getOrCreateOutputAnalyser();
 
   if (audioOutputContext.state === 'suspended') {
     audioOutputContext.resume();
@@ -273,15 +327,68 @@ function playPCMChunk(arrayBuffer) {
 
   const source = audioOutputContext.createBufferSource();
   source.buffer = buffer;
-  source.connect(audioOutputContext.destination);
+  source.connect(analyser);
 
   const now = audioOutputContext.currentTime;
-    if (nextPlayTime < now || nextPlayTime > now + 1.0) {
-      nextPlayTime = now;
-    }
-    source.start(nextPlayTime);
-    nextPlayTime += buffer.duration;
+  if (nextPlayTime < now || nextPlayTime > now + 1.0) {
+    nextPlayTime = now;
   }
+  source.start(nextPlayTime);
+  nextPlayTime += buffer.duration;
+}
+
+// Dynamic Audio-Reactive Waveform Visualizer
+function startWaveformVisualizer() {
+  const bars = document.querySelectorAll('.waveform-box .bar');
+  if (!bars.length) return;
+
+  const sampleBins = [1, 3, 5, 8, 12, 16, 22];
+
+  function renderWave() {
+    let inData = null;
+    let outData = null;
+
+    if (inputAnalyser) {
+      inData = new Uint8Array(inputAnalyser.frequencyBinCount);
+      inputAnalyser.getByteFrequencyData(inData);
+    }
+    if (outputAnalyser) {
+      outData = new Uint8Array(outputAnalyser.frequencyBinCount);
+      outputAnalyser.getByteFrequencyData(outData);
+    }
+
+    bars.forEach((bar, idx) => {
+      const bin = sampleBins[idx] || idx * 3;
+      const inVal = inData ? (inData[bin] || 0) : 0;
+      const outVal = outData ? (outData[bin] || 0) : 0;
+      const maxVal = Math.max(inVal, outVal);
+
+      // Resting state: 4px. Only animate when speech exceeds ambient room noise
+      let targetHeight = 4;
+      if (maxVal > 15) {
+        const ratio = (maxVal - 15) / 240.0;
+        targetHeight = Math.min(26, Math.round(4 + ratio * 22));
+      }
+      bar.style.height = `${targetHeight}px`;
+    });
+
+    animFrameId = requestAnimationFrame(renderWave);
+  }
+
+  if (animFrameId) cancelAnimationFrame(animFrameId);
+  animFrameId = requestAnimationFrame(renderWave);
+}
+
+function stopWaveformVisualizer() {
+  if (animFrameId) {
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+  }
+  const bars = document.querySelectorAll('.waveform-box .bar');
+  bars.forEach((bar) => {
+    bar.style.height = '4px';
+  });
+}
 
   // Voice Call WebSocket Connection (Mic Input & Speaker Output)
   async function startCall() {
@@ -331,7 +438,13 @@ function playPCMChunk(arrayBuffer) {
         audioInputContext = new (window.AudioContext || window.webkitAudioContext)();
         await audioInputContext.resume();
 
+        inputAnalyser = audioInputContext.createAnalyser();
+        inputAnalyser.fftSize = 64;
+        inputAnalyser.smoothingTimeConstant = 0.5;
+
         audioInputSource = audioInputContext.createMediaStreamSource(micStream);
+        audioInputSource.connect(inputAnalyser);
+
         // Buffer size 4096 gives ~85ms at 48kHz
         audioProcessor = audioInputContext.createScriptProcessor(4096, 1, 1);
 
@@ -357,6 +470,9 @@ function playPCMChunk(arrayBuffer) {
 
         audioInputSource.connect(audioProcessor);
         audioProcessor.connect(audioInputContext.destination);
+
+        // Start dynamic audio-reactive waveform
+        startWaveformVisualizer();
       };
 
           callSocket.onmessage = async (event) => {
@@ -398,7 +514,14 @@ function playPCMChunk(arrayBuffer) {
         callStatusText.textContent = 'Call Ended';
         callStatusText.className = 'call-status';
 
+        // Stop Waveform Visualizer
+        stopWaveformVisualizer();
+
         // Stop Audio Nodes
+        if (inputAnalyser) {
+          try { inputAnalyser.disconnect(); } catch (e) { }
+          inputAnalyser = null;
+        }
         if (audioProcessor) {
           try { audioProcessor.disconnect(); } catch (e) { }
           audioProcessor = null;
