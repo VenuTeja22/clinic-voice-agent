@@ -23,37 +23,30 @@ flowchart LR
     Broadcaster -->|Live Events /ws| Dashboard["Clinical Hospital Live Dashboard"]
 ```
 
-### End-to-End Pipeline Breakdown
+### How the Pipeline Works (Step-by-Step)
 
-1. **Audio Streaming & Full-Duplex Transport**:
-   - Direct bidirectional binary WebSocket (`/ws/call`) using Pipecat's `FastAPIWebsocketTransport`.
-   - The browser captures mic audio via the Web Audio API, downsamples from native hardware rates (44.1kHz / 48kHz) to **16,000Hz 16-bit Mono PCM**, and streams binary chunks directly to the backend.
-   - Eliminates third-party WebRTC/SIP room credit and token dependencies for maximum deployment autonomy and minimal latency.
+Here is what happens under the hood from the moment a caller starts a conversation:
 
-2. **Voice Activity Detection (VAD)**:
-   - Local **Silero VAD** running via ONNX Runtime inside Pipecat's `VADProcessor(vad_analyzer=vad)`.
-   - Detects sub-millisecond start-of-speech and end-of-speech frame boundaries, enabling natural caller interruption (barge-in) and accurate audio chunking.
+1. **Audio Capture in the Browser (`frontend/app.js`)**:
+   When the user clicks the call button, the browser requests microphone access through the Web Audio API. Because standard microphones capture at 44.1kHz or 48kHz, the client downsamples the stream in real time to **16kHz 16-bit Mono PCM**. These raw audio chunks are streamed directly to the backend over a dedicated binary WebSocket (`/ws/call`). This approach keeps the system fully self-contained—there is no need for third-party WebRTC room tokens or cloud media servers.
 
-3. **Speech-to-Text (STT)**:
-   - **ElevenLabs Real-time STT** transcribes spoken patient utterances with high accuracy for medical names and spoken digit sequences.
+2. **Voice Activity Detection & Interruption (`backend/bot.py`)**:
+   As audio chunks hit the server, Pipecat routes them through a local **Silero VAD** model running via ONNX Runtime. Silero listens for speech boundaries in milliseconds. If the caller speaks while the assistant is talking, Silero flags it immediately, halts the outgoing speech synthesis, and clears the playback buffer. This allows callers to interrupt (barge-in) naturally at any point in the conversation.
 
-4. **Conversational Intelligence & Reasoning (LLM)**:
-   - **Google Gemini 3.5 Flash Lite** (`gemini-3.5-flash-lite`) via Google GenAI SDK.
-   - Low-latency inference (<1.5s), strict system guardrails, and deterministic tool function calling.
+3. **Speech-to-Text (`ElevenLabs STT`)**:
+   Once Silero detects an end-of-speech pause, the speech frame is sent to **ElevenLabs Real-Time STT**. We use ElevenLabs here because it accurately transcribes doctor names and spoken digit sequences (phone numbers) without dropping numbers.
 
-5. **Text-to-Speech (TTS)**:
-   - **ElevenLabs Neural TTS** using the high-clarity **Bella** voice (`EXAVITQu4vr4xnSDxMaL`).
-   - Streams 24kHz synthesized audio frames back to the client over the same WebSocket, buffered and played through the browser's `AudioContext`.
+4. **Intent Handling & Tool Execution (`Google Gemini 3.5 Flash Lite` + `backend/tools.py`)**:
+   The transcribed text is passed to Gemini Flash Lite along with conversation history and our function-calling schemas. Gemini was chosen because its response latency is consistently under 1.5 seconds and it adheres strictly to tool definitions:
+   - When checking slots, Gemini calls `check_doctor_availability()`. The tool checks if the doctor is on leave and filters out any consultation hours that have already passed today.
+   - When booking, the agent asks for the caller's phone number, reads it back for explicit confirmation, and then calls `book_appointment()` to lock in the slot and generate a reference ID.
+   - When cancelling, `cancel_appointment()` pulls all appointments linked to that phone number. If multiple bookings exist, the assistant asks the caller which one to cancel before freeing the slot.
 
-6. **Data Storage & Deterministic Function Calling**:
-   - Dependency-free JSON data store (`clinic_data.json`) backed by `database.py`.
-   - Exposes three deterministic tools registered with Pipecat:
-     - `check_doctor_availability(doctor_name, date, specialty)`
-     - `book_appointment(patient_phone, doctor_name, slot_time, slot_date)`
-     - `cancel_appointment(patient_phone, doctor_name, slot_time, slot_date)`
+5. **Speech Synthesis & Playback (`ElevenLabs TTS` → Browser)**:
+   Gemini's response text is streamed to **ElevenLabs Neural TTS** using the Bella voice. ElevenLabs generates 24kHz raw PCM audio frames, which travel back down the same `/ws/call` WebSocket to the browser. The frontend queues these frames inside the Web Audio `AudioContext` and plays them back cleanly.
 
-7. **Live Real-Time Dashboard**:
-   - Secondary WebSocket channel (`/ws`) broadcasts transcripts and appointment state mutations in real time to the browser UI without page reloads.
+6. **Live Dashboard Sync (`backend/main.py` → `frontend/app.js`)**:
+   Alongside the audio WebSocket, the backend maintains a second WebSocket (`/ws`) for UI events. Whenever someone speaks or an appointment is booked or cancelled, the backend broadcasts a JSON event. The frontend catches this and updates the slot counts and appointment ledger table immediately, without a page reload.
 
 ---
 
