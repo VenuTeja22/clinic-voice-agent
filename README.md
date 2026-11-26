@@ -1,7 +1,5 @@
 # NexovCare Hospital — Autonomous Voice AI Doctor Appointment Assistant
 
-An autonomous, full-duplex conversational voice agent and real-time companion web console for healthcare outpatient scheduling. Built for the **Forward Deployed Engineer (FDE)** role at **NexovCare Hospital** (SDE Intern — Round 1 Assignment).
-
 The system enables callers to check specialist availability, book outpatient consultations, and manage cancellations via natural voice using **spoken phone-number identity** with **mandatory confirmation read-back**. The frontend is engineered with an authentic **Clinical Hospital Theme**, auto-updating instantaneously via WebSockets as the voice assistant operates.
 
 ---
