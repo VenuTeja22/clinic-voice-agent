@@ -66,7 +66,6 @@ flowchart LR
 * **Dynamic Rolling Date Auto-Seeding**: The application automatically seeds and maintains slots for **Today** and **Tomorrow** dynamically on any day the app runs, without overwriting past patient bookings.
 * **Real-Time Past-Slot Protection**: Slots earlier than the current local clock time today are automatically filtered out and blocked from booking.
 * **Clinical Boundary Protection**: The agent strictly declines to provide medical advice or diagnoses, steering callers to book an outpatient consultation.
-* **Emergency Protocol**: Any mention of acute symptoms (chest pain, severe bleeding, difficulty breathing) triggers an immediate emergency redirect to dial 108/911.
 
 ---
 
